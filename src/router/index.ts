@@ -17,6 +17,14 @@ const router = createRouter({
         breadcrumb: "Home",
       },
     },
+    {
+      path: "/form",
+      name: "form",
+      component: () => import("@/views/FormView.vue"),
+      meta: {
+        breadcrumb: "Form",
+      },
+    },
   ],
 });
 
