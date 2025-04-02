@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import { cn } from "@/lib/utils";
+import { RouterLink } from "vue-router";
 </script>
 
 <template>
   <nav
     :class="cn('flex items-center space-x-4 lg:space-x-6', $attrs.class ?? '')"
   >
-    <a
-      href="/"
-      class="text-sm font-medium transition-colors hover:text-primary"
+    <RouterLink
+      to="/"
+      class="font-medium transition-colors text-muted-foreground"
+      active-class="text-primary"
     >
-      Overview
-    </a>
-    <a
-      href="/form"
-      class="text-sm font-medium transition-colors text-muted-foreground hover:text-primary"
+      Dashboard</RouterLink
+    >
+    <RouterLink
+      to="/form"
+      class="font-medium transition-colors text-muted-foreground"
+      active-class="text-primary"
     >
       Form
-    </a>
+    </RouterLink>
   </nav>
 </template>
