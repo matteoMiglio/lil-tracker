@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,21 +16,22 @@ import type { Transaction, TransactionKind } from "@/types/transaction";
 import { generateFakeTransactions } from "@/lib/fakeData";
 import { DollarSign } from "lucide-vue-next";
 import { currencyFormatter } from "@/lib/formatters";
+import { useTransactionsStore } from "@/stores/transactions";
+import { storeToRefs } from "pinia";
 
-const transactions: Transaction[] = generateFakeTransactions(10);
+const store = useTransactionsStore();
 
-const incomes = transactions.filter(
-  (transaction) => transaction.kind === "income"
-);
-const expenses = transactions.filter(
-  (transaction) => transaction.kind === "expense"
+const transactions = computed(() => store.transactions);
+
+const incomes = computed(() => store.getIncomes);
+const expenses = computed(() => store.getExpenses);
+
+const totalRevenue = computed(() =>
+  incomes.value.reduce((sum, income) => sum + income.amount, 0)
 );
 
-const totalRevenue = ref(
-  incomes.reduce((sum, income) => sum + income.amount, 0)
-);
-const totalExpenses = ref(
-  expenses.reduce((sum, expense) => sum + expense.amount, 0)
+const totalExpenses = computed(() =>
+  expenses.value.reduce((sum, expense) => sum + expense.amount, 0)
 );
 
 const balance = computed(() => {
@@ -46,6 +47,10 @@ const formattedTotalRevenue = computed(() =>
 const formattedTotalExpenses = computed(() =>
   currencyFormatter.format(totalExpenses.value)
 );
+
+onMounted(() => {
+  store.fetchData();
+});
 </script>
 
 <template>
