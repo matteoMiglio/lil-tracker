@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,11 +15,37 @@ import RecentTransactions from "@/components/RecentTransactions.vue";
 import type { Transaction, TransactionKind } from "@/types/transaction";
 import { generateFakeTransactions } from "@/lib/fakeData";
 import { DollarSign } from "lucide-vue-next";
+import { currencyFormatter } from "@/lib/formatters";
 
-const transactions = generateFakeTransactions(100);
+const transactions: Transaction[] = generateFakeTransactions(10);
 
-const totalRevenue = ref(1000);
-const totalExpenses = ref(100);
+const incomes = transactions.filter(
+  (transaction) => transaction.kind === "income"
+);
+const expenses = transactions.filter(
+  (transaction) => transaction.kind === "expense"
+);
+
+const totalRevenue = ref(
+  incomes.reduce((sum, income) => sum + income.amount, 0)
+);
+const totalExpenses = ref(
+  expenses.reduce((sum, expense) => sum + expense.amount, 0)
+);
+
+const balance = computed(() => {
+  return totalRevenue.value - totalExpenses.value;
+});
+
+const formattedBalance = computed(() =>
+  currencyFormatter.format(balance.value)
+);
+const formattedTotalRevenue = computed(() =>
+  currencyFormatter.format(totalRevenue.value)
+);
+const formattedTotalExpenses = computed(() =>
+  currencyFormatter.format(totalExpenses.value)
+);
 </script>
 
 <template>
@@ -40,7 +66,18 @@ const totalExpenses = ref(100);
           <TabsTrigger value="expenses" disabled> Expenses </TabsTrigger>
         </TabsList>
         <TabsContent value="overview" class="space-y-4">
-          <div class="grid gap-4 md:grid-cols-2">
+          <div class="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader
+                class="flex flex-row items-center justify-between pb-2 space-y-0"
+              >
+                <CardTitle class="text-sm font-medium"> Balance </CardTitle>
+                <DollarSign class="size-4" />
+              </CardHeader>
+              <CardContent>
+                <div class="text-2xl font-bold">{{ formattedBalance }}</div>
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader
                 class="flex flex-row items-center justify-between pb-2 space-y-0"
@@ -51,10 +88,9 @@ const totalExpenses = ref(100);
                 <DollarSign class="text-green-400 size-4" />
               </CardHeader>
               <CardContent>
-                <div class="text-2xl font-bold">{{ totalRevenue }} €</div>
-                <p class="text-xs text-muted-foreground">
-                  +20.1% from last month
-                </p>
+                <div class="text-2xl font-bold">
+                  {{ formattedTotalRevenue }}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -67,10 +103,9 @@ const totalExpenses = ref(100);
                 <DollarSign class="text-red-400 size-4" />
               </CardHeader>
               <CardContent>
-                <div class="text-2xl font-bold">{{ totalExpenses }} €</div>
-                <p class="text-xs text-muted-foreground">
-                  +180.1% from last month
-                </p>
+                <div class="text-2xl font-bold">
+                  {{ formattedTotalExpenses }}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -86,9 +121,6 @@ const totalExpenses = ref(100);
             <Card class="col-span-3">
               <CardHeader>
                 <CardTitle>Recent Sales</CardTitle>
-                <CardDescription>
-                  You made 265 sales this month.
-                </CardDescription>
               </CardHeader>
               <CardContent>
                 <RecentTransactions />
