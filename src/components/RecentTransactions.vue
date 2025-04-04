@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Transaction } from "@/types/transaction";
-import { formatDate } from "date-fns";
+import { currencyFormatter, formatDateString } from "@/lib/formatters";
 
 const props = defineProps<{
   transactions: Transaction[];
 }>();
-
-const format = (date: string) => {
-  const parsedDate = new Date(date);
-  return formatDate(parsedDate, "dd/MM/yyyy");
-};
 </script>
 
 <template>
@@ -19,9 +14,11 @@ const format = (date: string) => {
       class="flex items-center justify-between"
       v-for="transaction in transactions"
     >
-      <div>{{ format(transaction.date) }}</div>
+      <div>{{ formatDateString(transaction.date) }}</div>
       <div>{{ transaction.kind }}</div>
-      <div class="font-medium">{{ transaction.amount }} €</div>
+      <div class="font-medium">
+        {{ currencyFormatter.format(transaction.amount) }}
+      </div>
     </div>
   </div>
 </template>
