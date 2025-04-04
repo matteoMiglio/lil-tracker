@@ -123,7 +123,7 @@ const formattedTotalExpenses = computed(() =>
                 <CardTitle>Recent Sales</CardTitle>
               </CardHeader>
               <CardContent>
-                <RecentTransactions />
+                <RecentTransactions :transactions="transactions.slice(0, 10)" />
               </CardContent>
             </Card>
           </div>
