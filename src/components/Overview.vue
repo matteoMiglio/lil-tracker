@@ -2,7 +2,7 @@
 import { BarChart } from "@/components/ui/chart-bar";
 import type { Transaction } from "@/types/transaction";
 import { computed } from "vue";
-import { currencyFormatter } from "@/lib/formatters";
+import CustomChartTooltip from "@/components/CustomChartTooltip.vue";
 
 const props = defineProps<{
   incomes: Transaction[];
@@ -68,5 +68,6 @@ const data = computed(() => {
           : '';
       }
     "
+    :custom-tooltip="CustomChartTooltip"
   />
 </template>
