@@ -7,6 +7,11 @@ const API_BASE_URL = "/api";
 export const useTransactionsStore = defineStore("transactions", {
   state: () => ({
     transactions: [] as Transaction[],
+    newItem: {
+      amount: null,
+      date: null,
+      kind: "expense",
+    } as Omit<Transaction, "id">,
     errors: {} as { [key: string]: string },
     loading: false,
     error: null as string | null,
@@ -46,6 +51,13 @@ export const useTransactionsStore = defineStore("transactions", {
           this.loading = false;
         }, 300);
       }
+    },
+    resetNewItem() {
+      this.newItem = {
+        amount: null,
+        date: null,
+        kind: "expense",
+      } as Omit<Transaction, "id">;
     },
   },
 });
