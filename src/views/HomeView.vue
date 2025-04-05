@@ -12,10 +12,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainNav from "@/components/MainNav.vue";
 import Overview from "@/components/chart/Overview.vue";
 import RecentTransactions from "@/components/RecentTransactions.vue";
-import type { Transaction, TransactionKind } from "@/types/transaction";
-import { generateFakeTransactions } from "@/lib/fakeData";
+import DataTable from "@/components/table/DataTable.vue";
 import { DollarSign } from "lucide-vue-next";
 import { currencyFormatter } from "@/lib/formatters";
+import type { Transaction, TransactionKind } from "@/types/transaction";
 import { useTransactionsStore } from "@/stores/transactions";
 import { storeToRefs } from "pinia";
 
@@ -67,8 +67,8 @@ onMounted(() => {
       <Tabs default-value="overview" class="flex flex-col gap-4">
         <TabsList class="grid w-full grid-cols-3 md:w-72">
           <TabsTrigger value="overview"> Overview </TabsTrigger>
-          <TabsTrigger value="incomes" disabled> Entrate </TabsTrigger>
-          <TabsTrigger value="expenses" disabled> Uscite </TabsTrigger>
+          <TabsTrigger value="incomes"> Entrate </TabsTrigger>
+          <TabsTrigger value="expenses"> Uscite </TabsTrigger>
         </TabsList>
         <TabsContent value="overview" class="mt-0">
           <div class="flex flex-col gap-4">
@@ -144,6 +144,12 @@ onMounted(() => {
               </Card>
             </div>
           </div>
+        </TabsContent>
+        <TabsContent value="incomes" class="mt-0">
+          <DataTable :data="incomes" :title="'Entrate'" />
+        </TabsContent>
+        <TabsContent value="expenses" class="mt-0">
+          <DataTable :data="expenses" :title="'Uscite'" />
         </TabsContent>
       </Tabs>
     </div>
