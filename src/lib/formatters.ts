@@ -6,7 +6,7 @@ import {
   type DateValue,
 } from "@internationalized/date";
 
-export const currencyFormatter = new Intl.NumberFormat("it-IT", {
+export const currencyFormatter = new Intl.NumberFormat(it.code, {
   style: "currency",
   currency: "EUR",
   minimumFractionDigits: 0,
