@@ -60,77 +60,81 @@ onMounted(() => {
         <MainNav class="mx-6" />
       </div>
     </div>
-    <div class="flex-1 p-8 pt-6 space-y-4">
-      <div class="flex items-center justify-between space-y-2">
+    <div class="flex flex-col gap-4 px-6 py-4">
+      <div class="flex items-center justify-between">
         <h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
       </div>
-      <Tabs default-value="overview" class="space-y-4">
-        <TabsList>
+      <Tabs default-value="overview" class="flex flex-col gap-4">
+        <TabsList class="grid w-full grid-cols-3 md:w-80">
           <TabsTrigger value="overview"> Overview </TabsTrigger>
           <TabsTrigger value="incomes" disabled> Incomes </TabsTrigger>
           <TabsTrigger value="expenses" disabled> Expenses </TabsTrigger>
         </TabsList>
-        <TabsContent value="overview" class="space-y-4">
-          <div class="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader
-                class="flex flex-row items-center justify-between pb-2 space-y-0"
-              >
-                <CardTitle class="text-sm font-medium"> Balance </CardTitle>
-                <DollarSign class="size-4" />
-              </CardHeader>
-              <CardContent>
-                <div class="text-2xl font-bold">{{ formattedBalance }}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader
-                class="flex flex-row items-center justify-between pb-2 space-y-0"
-              >
-                <CardTitle class="text-sm font-medium">
-                  Total Revenue
-                </CardTitle>
-                <DollarSign class="text-green-400 size-4" />
-              </CardHeader>
-              <CardContent>
-                <div class="text-2xl font-bold">
-                  {{ formattedTotalRevenue }}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader
-                class="flex flex-row items-center justify-between pb-2 space-y-0"
-              >
-                <CardTitle class="text-sm font-medium">
-                  Total Expenses
-                </CardTitle>
-                <DollarSign class="text-red-400 size-4" />
-              </CardHeader>
-              <CardContent>
-                <div class="text-2xl font-bold">
-                  {{ formattedTotalExpenses }}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card class="col-span-4">
-              <CardHeader>
-                <CardTitle>Overview</CardTitle>
-              </CardHeader>
-              <CardContent class="pl-2">
-                <Overview :incomes="incomes" :expenses="expenses" />
-              </CardContent>
-            </Card>
-            <Card class="col-span-3">
-              <CardHeader>
-                <CardTitle>Recent Sales</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RecentTransactions :transactions="transactions.slice(0, 10)" />
-              </CardContent>
-            </Card>
+        <TabsContent value="overview" class="mt-0">
+          <div class="flex flex-col gap-4">
+            <div class="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader
+                  class="flex flex-row items-center justify-between pb-2 space-y-0"
+                >
+                  <CardTitle class="text-sm font-medium"> Balance </CardTitle>
+                  <DollarSign class="size-4" />
+                </CardHeader>
+                <CardContent>
+                  <div class="text-2xl font-bold">{{ formattedBalance }}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader
+                  class="flex flex-row items-center justify-between pb-2 space-y-0"
+                >
+                  <CardTitle class="text-sm font-medium">
+                    Total Revenue
+                  </CardTitle>
+                  <DollarSign class="text-green-400 size-4" />
+                </CardHeader>
+                <CardContent>
+                  <div class="text-2xl font-bold">
+                    {{ formattedTotalRevenue }}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader
+                  class="flex flex-row items-center justify-between pb-2 space-y-0"
+                >
+                  <CardTitle class="text-sm font-medium">
+                    Total Expenses
+                  </CardTitle>
+                  <DollarSign class="text-red-400 size-4" />
+                </CardHeader>
+                <CardContent>
+                  <div class="text-2xl font-bold">
+                    {{ formattedTotalExpenses }}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <Card class="md:col-span-2 lg:col-span-4">
+                <CardHeader>
+                  <CardTitle>Overview</CardTitle>
+                </CardHeader>
+                <CardContent class="pl-2">
+                  <Overview :incomes="incomes" :expenses="expenses" />
+                </CardContent>
+              </Card>
+              <Card class="md:col-span-2 lg:col-span-3">
+                <CardHeader>
+                  <CardTitle>Recent Sales</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <RecentTransactions
+                    :transactions="transactions.slice(0, 10)"
+                  />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
