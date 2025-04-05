@@ -72,6 +72,16 @@
           </div>
 
           <div class="space-y-2">
+            <Label for="description">Descrizione</Label>
+            <Input
+              id="description"
+              type="text"
+              placeholder="Aggiungi una breve descrizione"
+              v-model="newItem.description"
+            />
+          </div>
+
+          <div class="space-y-2">
             <Label for="date">Data</Label>
             <Popover>
               <PopoverTrigger as-child>
