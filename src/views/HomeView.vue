@@ -81,7 +81,15 @@ onMounted(() => {
                   <DollarSign class="size-4" />
                 </CardHeader>
                 <CardContent>
-                  <div class="text-2xl font-bold">{{ formattedBalance }}</div>
+                  <div
+                    class="text-2xl font-bold"
+                    :class="{
+                      'text-red-600': balance < 0,
+                      'text-green-600': balance >= 0,
+                    }"
+                  >
+                    {{ formattedBalance }}
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -91,7 +99,7 @@ onMounted(() => {
                   <CardTitle class="text-sm font-medium">
                     Total Revenue
                   </CardTitle>
-                  <DollarSign class="text-green-400 size-4" />
+                  <DollarSign class="text-green-600 size-4" />
                 </CardHeader>
                 <CardContent>
                   <div class="text-2xl font-bold">
@@ -106,7 +114,7 @@ onMounted(() => {
                   <CardTitle class="text-sm font-medium">
                     Total Expenses
                   </CardTitle>
-                  <DollarSign class="text-red-400 size-4" />
+                  <DollarSign class="text-red-600 size-4" />
                 </CardHeader>
                 <CardContent>
                   <div class="text-2xl font-bold">
