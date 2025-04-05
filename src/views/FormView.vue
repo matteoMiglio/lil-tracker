@@ -6,8 +6,8 @@
       </div>
     </div>
   </div>
-  <div class="flex-1 p-8">
-    <Card>
+  <div class="flex items-center justify-center p-8">
+    <Card class="w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Add new transaction</CardTitle>
       </CardHeader>
