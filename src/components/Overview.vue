@@ -1,27 +1,72 @@
 <script setup lang="ts">
 import { BarChart } from "@/components/ui/chart-bar";
+import type { Transaction } from "@/types/transaction";
+import { computed } from "vue";
+import { currencyFormatter } from "@/lib/formatters";
 
-const data = [
-  { name: "Jan", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Feb", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Mar", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Apr", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "May", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Jun", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Jul", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Aug", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Sep", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Oct", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Nov", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "Dec", total: Math.floor(Math.random() * 5000) + 1000 },
-];
+const props = defineProps<{
+  incomes: Transaction[];
+  expenses: Transaction[];
+}>();
+
+function groupByMonth(transactions: Transaction[]) {
+  const months = [
+    "Gennaio",
+    "Febbraio",
+    "Marzo",
+    "Aprile",
+    "Maggio",
+    "Giugno",
+    "Luglio",
+    "Agosto",
+    "Settembre",
+    "Ottobre",
+    "Novembre",
+    "Dicembre",
+  ];
+
+  const monthlyTotals = Array(12).fill(0);
+
+  transactions.forEach((transaction) => {
+    const date = new Date(transaction.date);
+    if (!isNaN(date.getTime())) {
+      const monthIndex = date.getMonth();
+      monthlyTotals[monthIndex] += Number(transaction.amount);
+    }
+  });
+
+  return months.map((name, index) => ({
+    name,
+    total: monthlyTotals[index],
+  }));
+}
+
+const data = computed(() => {
+  const incomesByMonth = groupByMonth(props.incomes);
+  const expensesByMonth = groupByMonth(props.expenses);
+
+  return incomesByMonth
+    .map((income, index) => ({
+      name: income.name,
+      income: income.total,
+      expense: expensesByMonth[index]?.total || 0,
+    }))
+    .filter((item) => item.income > 0 || item.expense > 0);
+});
 </script>
 
 <template>
   <BarChart
     :data="data"
-    :categories="['total']"
-    :index="'name'"
+    :categories="['income', 'expense']"
+    index="name"
     :rounded-corners="4"
+    :y-formatter="
+      (tick, i) => {
+        return typeof tick === 'number'
+          ? `€ ${new Intl.NumberFormat('it').format(tick).toString()}`
+          : '';
+      }
+    "
   />
 </template>

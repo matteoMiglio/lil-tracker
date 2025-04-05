@@ -120,7 +120,7 @@ onMounted(() => {
                 <CardTitle>Overview</CardTitle>
               </CardHeader>
               <CardContent class="pl-2">
-                <Overview />
+                <Overview :incomes="incomes" :expenses="expenses" />
               </CardContent>
             </Card>
             <Card class="col-span-3">
