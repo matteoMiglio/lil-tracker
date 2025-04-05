@@ -10,6 +10,7 @@ export const useTransactionsStore = defineStore("transactions", {
     newItem: {
       amount: null,
       date: null,
+      description: null,
       kind: "expense",
     } as Omit<Transaction, "id">,
     errors: {} as { [key: string]: string },
@@ -29,6 +30,41 @@ export const useTransactionsStore = defineStore("transactions", {
     },
   },
   actions: {
+    async add() {
+      try {
+        console.debug("Adding new transaction");
+
+        // const response = await fetch(`${API_BASE_URL}/transactions`, {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify(item),
+        // });
+
+        // console.debug("Response Status:", response.status);
+
+        // if (!response.ok) {
+        //   throw new Error(
+        //     "Si è verificato un errore durante la creazione di una nuova transazione"
+        //   );
+        // }
+
+        // const rawTransaction = (await response.json()) as Transaction;
+
+        // this.transactions.push(rawTransaction);
+        this.transactions.push({
+          ...this.newItem,
+          id: crypto.randomUUID(),
+        } as Transaction);
+
+        this.error = null;
+      } catch (error: any) {
+        this.error = error;
+        console.error(error.message);
+        throw error.message;
+      }
+    },
     async delete(id: string) {
       console.debug("Deleting transaction:", id);
       try {
@@ -56,8 +92,9 @@ export const useTransactionsStore = defineStore("transactions", {
     async fetchData() {
       this.loading = true;
       console.debug("Fetching transactions...");
+
       try {
-        const transactions: Transaction[] = generateFakeTransactions(70);
+        const transactions: Transaction[] = generateFakeTransactions(2);
         // const response = await fetch(`${API_BASE_URL}/transactions`);
         // const transactions: Transaction[] = await response.json();
 
@@ -80,6 +117,7 @@ export const useTransactionsStore = defineStore("transactions", {
       this.newItem = {
         amount: null,
         date: null,
+        description: null,
         kind: "expense",
       } as Omit<Transaction, "id">;
     },

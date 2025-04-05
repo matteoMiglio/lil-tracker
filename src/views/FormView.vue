@@ -182,6 +182,8 @@ const handleSubmit = () => {
   const now = new Date();
 
   try {
+    store.add();
+
     toast.success("Transazione registrata", {
       description: formatLongDateString(now),
     });
