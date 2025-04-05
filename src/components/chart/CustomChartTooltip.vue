@@ -27,7 +27,7 @@ defineProps<{
           />
           <span>{{ item.name }}</span>
         </div>
-        <span class="ml-4 font-mono font-semibold">{{
+        <span class="ml-4 font-semibold">{{
           currencyFormatter.format(item.value ?? 0)
         }}</span>
       </div>

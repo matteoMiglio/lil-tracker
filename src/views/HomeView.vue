@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MainNav from "@/components/MainNav.vue";
-import Overview from "@/components/Overview.vue";
+import Overview from "@/components/chart/Overview.vue";
 import RecentTransactions from "@/components/RecentTransactions.vue";
 import type { Transaction, TransactionKind } from "@/types/transaction";
 import { generateFakeTransactions } from "@/lib/fakeData";

@@ -2,7 +2,7 @@
 import { BarChart } from "@/components/ui/chart-bar";
 import type { Transaction } from "@/types/transaction";
 import { computed } from "vue";
-import CustomChartTooltip from "@/components/CustomChartTooltip.vue";
+import CustomChartTooltip from "@/components/chart/CustomChartTooltip.vue";
 
 const props = defineProps<{
   incomes: Transaction[];
