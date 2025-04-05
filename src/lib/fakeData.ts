@@ -6,7 +6,7 @@ export function generateFakeTransaction(): Transaction {
     id: faker.string.uuid(),
     amount: parseFloat(faker.finance.amount({ min: 5, max: 500, dec: 2 })),
     date: faker.date.recent({ days: 90 }).toISOString(),
-    description: faker.lorem.sentence(),
+    description: faker.lorem.sentence({ min: 1, max: 10 }),
     kind: faker.helpers.arrayElement<TransactionKind>(["income", "expense"]),
   };
 }

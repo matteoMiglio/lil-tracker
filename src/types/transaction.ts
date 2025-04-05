@@ -4,6 +4,7 @@ interface Transaction {
   id: string;
   amount: number | null;
   date: string | null;
+  description: string | null;
   kind: TransactionKind;
 }
 
