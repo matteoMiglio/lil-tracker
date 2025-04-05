@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Toaster } from "@/components/ui/sonner";
 import MainNav from "@/components/MainNav.vue";
 import Overview from "@/components/chart/Overview.vue";
 import RecentTransactions from "@/components/RecentTransactions.vue";
@@ -154,4 +155,5 @@ onMounted(() => {
       </Tabs>
     </div>
   </div>
+  <Toaster />
 </template>

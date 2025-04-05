@@ -7,7 +7,6 @@ import {
   ChevronsRight,
 } from "lucide-vue-next";
 import { useTransactionsStore } from "@/stores/transactions";
-import { Toaster } from "@/components/ui/sonner";
 import { toast } from "vue-sonner";
 
 import { Button } from "@/components/ui/button";
