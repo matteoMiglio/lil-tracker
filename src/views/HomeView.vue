@@ -65,10 +65,10 @@ onMounted(() => {
         <h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
       </div>
       <Tabs default-value="overview" class="flex flex-col gap-4">
-        <TabsList class="grid w-full grid-cols-3 md:w-80">
+        <TabsList class="grid w-full grid-cols-3 md:w-72">
           <TabsTrigger value="overview"> Overview </TabsTrigger>
-          <TabsTrigger value="incomes" disabled> Incomes </TabsTrigger>
-          <TabsTrigger value="expenses" disabled> Expenses </TabsTrigger>
+          <TabsTrigger value="incomes" disabled> Entrate </TabsTrigger>
+          <TabsTrigger value="expenses" disabled> Uscite </TabsTrigger>
         </TabsList>
         <TabsContent value="overview" class="mt-0">
           <div class="flex flex-col gap-4">
@@ -77,7 +77,7 @@ onMounted(() => {
                 <CardHeader
                   class="flex flex-row items-center justify-between pb-2 space-y-0"
                 >
-                  <CardTitle class="text-sm font-medium"> Balance </CardTitle>
+                  <CardTitle class="text-sm font-medium"> Bilancio </CardTitle>
                   <DollarSign class="size-4" />
                 </CardHeader>
                 <CardContent>
@@ -97,7 +97,7 @@ onMounted(() => {
                   class="flex flex-row items-center justify-between pb-2 space-y-0"
                 >
                   <CardTitle class="text-sm font-medium">
-                    Total Revenue
+                    Totale Entrate
                   </CardTitle>
                   <DollarSign class="text-green-600 size-4" />
                 </CardHeader>
@@ -112,7 +112,7 @@ onMounted(() => {
                   class="flex flex-row items-center justify-between pb-2 space-y-0"
                 >
                   <CardTitle class="text-sm font-medium">
-                    Total Expenses
+                    Totale Uscite
                   </CardTitle>
                   <DollarSign class="text-red-600 size-4" />
                 </CardHeader>
@@ -134,7 +134,7 @@ onMounted(() => {
               </Card>
               <Card class="md:col-span-2 lg:col-span-3">
                 <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
+                  <CardTitle>Transazioni recenti</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <RecentTransactions

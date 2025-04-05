@@ -48,17 +48,17 @@ const data = computed(() => {
   return incomesByMonth
     .map((income, index) => ({
       name: income.name,
-      income: income.total,
-      expense: expensesByMonth[index]?.total || 0,
+      entrate: income.total,
+      uscite: expensesByMonth[index]?.total || 0,
     }))
-    .filter((item) => item.income > 0 || item.expense > 0);
+    .filter((item) => item.entrate > 0 || item.uscite > 0);
 });
 </script>
 
 <template>
   <BarChart
     :data="data"
-    :categories="['income', 'expense']"
+    :categories="['entrate', 'uscite']"
     index="name"
     :rounded-corners="4"
     :y-formatter="

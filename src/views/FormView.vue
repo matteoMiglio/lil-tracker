@@ -9,12 +9,12 @@
   <div class="flex items-center justify-center p-8">
     <Card class="w-full max-w-2xl">
       <CardHeader>
-        <CardTitle>Add new transaction</CardTitle>
+        <CardTitle>Aggiungi nuova transazione</CardTitle>
       </CardHeader>
       <form @submit.prevent="handleSubmit">
         <CardContent class="space-y-4">
           <div class="space-y-2">
-            <Label for="kind">Type</Label>
+            <Label for="kind">Tipo</Label>
             <RadioGroup
               id="kind"
               class="flex gap-4"
@@ -32,7 +32,7 @@
                       : '',
                   ]"
                 >
-                  Expense
+                  Uscita
                 </Label>
               </div>
               <div class="flex items-center space-x-2">
@@ -46,14 +46,14 @@
                       : '',
                   ]"
                 >
-                  Income
+                  Entrata
                 </Label>
               </div>
             </RadioGroup>
           </div>
 
           <div class="space-y-2">
-            <Label for="amount">Amount</Label>
+            <Label for="amount">Ammontare</Label>
             <div class="relative">
               <span
                 class="absolute -translate-y-1/2 left-3 top-1/2 text-muted-foreground"
@@ -72,7 +72,7 @@
           </div>
 
           <div class="space-y-2">
-            <Label for="date">Date</Label>
+            <Label for="date">Data</Label>
             <Popover>
               <PopoverTrigger as-child>
                 <Button
@@ -110,7 +110,7 @@
         <CardFooter>
           <Button type="submit" class="w-full">
             <PlusCircleIcon class="w-4 h-4 mr-2" />
-            Add {{ newItem.kind }}
+            Aggiungi
           </Button>
         </CardFooter>
       </form>
