@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-4">
-    <div class="grid grid-cols-1">
+    <div class="border rounded-md">
       <Table>
         <TableHeader>
           <TableRow
@@ -26,6 +26,7 @@
               v-for="row in table.getRowModel().rows"
               :key="row.id"
               :data-state="row.getIsSelected() && 'selected'"
+              class="h-10"
             >
               <TableCell
                 v-for="cell in row.getVisibleCells()"
