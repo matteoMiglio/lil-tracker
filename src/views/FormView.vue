@@ -19,7 +19,7 @@
               id="kind"
               class="flex gap-4"
               :defaultValue="'expense'"
-              v-model="transactionKind"
+              v-model="newItem.kind"
             >
               <div class="flex items-center space-x-2">
                 <RadioGroupItem value="expense" id="expense" />
@@ -27,7 +27,7 @@
                   for="expense"
                   :class="[
                     'cursor-pointer rounded-md px-3 py-1',
-                    transactionKind === 'expense'
+                    newItem.kind === 'expense'
                       ? 'bg-destructive/10 text-destructive font-medium'
                       : '',
                   ]"
@@ -41,7 +41,7 @@
                   for="income"
                   :class="[
                     'cursor-pointer rounded-md px-3 py-1',
-                    transactionKind === 'income'
+                    newItem.kind === 'income'
                       ? 'bg-green-500/10 text-green-600 font-medium'
                       : '',
                   ]"
@@ -66,7 +66,7 @@
                 min="0"
                 placeholder="0,00"
                 class="pl-8"
-                v-model="amount"
+                v-model="newItem.amount"
               />
             </div>
           </div>
@@ -93,6 +93,15 @@
                   initialFocus
                   :locale="it.code"
                   :week-starts-on="0"
+                  @update:model-value="
+                    (v) => {
+                      if (v) {
+                        newItem.date = v.toString();
+                      } else {
+                        newItem.date = null;
+                      }
+                    }
+                  "
                 />
               </PopoverContent>
             </Popover>
@@ -101,7 +110,7 @@
         <CardFooter>
           <Button type="submit" class="w-full">
             <PlusCircleIcon class="w-4 h-4 mr-2" />
-            Add {{ transactionKind }}
+            Add {{ newItem.kind }}
           </Button>
         </CardFooter>
       </form>
@@ -141,19 +150,21 @@ import {
   today,
   getLocalTimeZone,
 } from "@internationalized/date";
+import { useTransactionsStore } from "@/stores/transactions";
+import { Transaction } from "@/types/transaction";
+import { storeToRefs } from "pinia";
 
-const transactionKind = ref("expense");
+const store = useTransactionsStore();
+
+const { newItem } = storeToRefs(store);
 const date = ref<DateValue>(today(getLocalTimeZone()));
-const amount = ref(null);
+
+newItem.value.date = date.value.toString();
 
 const handleSubmit = () => {
-  console.log({
-    amount: amount.value,
-    kind: transactionKind.value,
-    date: date.value.toString(),
-  });
+  console.log(newItem.value);
 
-  if (!amount.value || !date.value) {
+  if (!newItem.value.amount || !date.value) {
     console.debug("Please fill all fields");
     return;
   }
@@ -165,10 +176,10 @@ const handleSubmit = () => {
       description: formatLongDateString(now),
     });
 
-    amount.value = null;
-    transactionKind.value = "expense";
-    date.value = today(getLocalTimeZone());
     // Reset the form
+    store.resetNewItem();
+    date.value = today(getLocalTimeZone());
+    newItem.value.date = date.value.toString();
   } catch (error) {
     toast.error("Error", {
       description: "Something went wrong",

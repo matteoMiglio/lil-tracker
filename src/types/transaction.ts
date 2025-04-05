@@ -2,9 +2,8 @@ type TransactionKind = "income" | "expense";
 
 interface Transaction {
   id: string;
-  amount: number;
-  date: string;
-  description: string;
+  amount: number | null;
+  date: string | null;
   kind: TransactionKind;
 }
 
