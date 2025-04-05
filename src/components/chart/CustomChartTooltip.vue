@@ -15,6 +15,11 @@ defineProps<{
 <template>
   <Card class="text-sm">
     <CardContent class="p-3 min-w-[180px] flex flex-col gap-2">
+      <template v-if="title">
+        <div class="text-xl font-medium">
+          {{ title }}
+        </div>
+      </template>
       <div
         v-for="(item, key) in data"
         :key="key"
