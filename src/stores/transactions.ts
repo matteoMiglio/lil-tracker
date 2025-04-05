@@ -29,11 +29,35 @@ export const useTransactionsStore = defineStore("transactions", {
     },
   },
   actions: {
+    async delete(id: string) {
+      console.debug("Deleting transaction:", id);
+      try {
+        // const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+        //   method: "DELETE",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        // });
+
+        // console.debug("Response Status:", response.status);
+
+        // if (response.status !== 204) {
+        //   throw new Error("Failed to delete transaction");
+        // }
+
+        this.transactions = this.transactions.filter((item) => item.id !== id);
+
+        this.error = null;
+      } catch (error: any) {
+        this.error = error;
+        console.error(error);
+      }
+    },
     async fetchData() {
       this.loading = true;
       console.debug("Fetching transactions...");
       try {
-        const transactions: Transaction[] = generateFakeTransactions(1000);
+        const transactions: Transaction[] = generateFakeTransactions(70);
         // const response = await fetch(`${API_BASE_URL}/transactions`);
         // const transactions: Transaction[] = await response.json();
 

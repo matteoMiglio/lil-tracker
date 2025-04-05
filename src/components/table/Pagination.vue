@@ -6,6 +6,9 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-vue-next";
+import { useTransactionsStore } from "@/stores/transactions";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "vue-sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,84 +18,132 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Trash2 } from "lucide-vue-next";
+
+import { formatLongDateString } from "@/lib/formatters";
 import type { Transaction } from "@/types/transaction";
 
 interface DataTablePaginationProps {
   table: Table<Transaction>;
 }
 
-defineProps<DataTablePaginationProps>();
+const props = defineProps<DataTablePaginationProps>();
+
+const store = useTransactionsStore();
+
+const deleteTransactions = () => {
+  if (props.table.getSelectedRowModel().rows.length) {
+    let error = null;
+    props.table.getSelectedRowModel().rows.forEach((row) => {
+      if (!row.original?.id) return;
+      try {
+        store.delete(row.original.id);
+      } catch (err) {
+        error = err;
+        toast.error("Error", {
+          description: "Something went wrong",
+        });
+      } finally {
+        if (!error) {
+          props.table.toggleAllRowsSelected(false);
+          const now = new Date();
+          toast.success("Transazioni cancellate", {
+            description: formatLongDateString(now),
+          });
+        }
+      }
+    });
+  } else {
+    console.warn("No rows selected");
+  }
+};
 </script>
 
 <template>
-  <div class="flex items-center justify-end gap-6 lg:gap-8">
-    <div class="flex-1 text-sm text-muted-foreground">
-      {{ table.getFilteredSelectedRowModel().rows.length }} di
-      {{ table.getFilteredRowModel().rows.length }} righe selezionate.
-    </div>
-    <div class="flex items-center gap-2">
-      <p class="text-sm font-medium">Elementi mostrati</p>
-      <Select
-        :model-value="`${table.getState().pagination.pageSize}`"
-        @update:model-value="(value) => table.setPageSize(Number(value))"
-      >
-        <SelectTrigger class="h-8 w-[70px]">
-          <SelectValue
-            :placeholder="`${table.getState().pagination.pageSize}`"
-          />
-        </SelectTrigger>
-        <SelectContent side="top">
-          <SelectItem
-            v-for="pageSize in [10, 20, 30, 40, 50]"
-            :key="pageSize"
-            :value="`${pageSize}`"
-          >
-            {{ pageSize }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-    <div class="flex w-[100px] items-center justify-center text-sm font-medium">
-      Pagina {{ table.getState().pagination.pageIndex + 1 }} di
-      {{ table.getPageCount() }}
-    </div>
+  <div class="flex flex-row flex-wrap justify-between gap-2">
     <div class="flex items-center gap-2">
       <Button
-        variant="outline"
-        class="hidden w-8 h-8 p-0 lg:flex"
-        :disabled="!table.getCanPreviousPage()"
-        @click="table.setPageIndex(0)"
+        variant="destructive"
+        type="button"
+        size="sm"
+        v-if="table.getSelectedRowModel().rows.length"
+        @click="deleteTransactions"
       >
-        <span class="sr-only">Vai alla prima pagina</span>
-        <ChevronsLeft class="w-4 h-4" />
+        Elimina
+        <Trash2 class="size-4" />
       </Button>
-      <Button
-        variant="outline"
-        class="w-8 h-8 p-0"
-        :disabled="!table.getCanPreviousPage()"
-        @click="table.previousPage()"
+      <div class="flex-1 text-sm text-muted-foreground">
+        {{ table.getFilteredSelectedRowModel().rows.length }} di
+        {{ table.getFilteredRowModel().rows.length }} righe selezionate.
+      </div>
+    </div>
+    <div class="flex items-center justify-end gap-6 lg:gap-8">
+      <div class="flex items-center gap-2">
+        <p class="text-sm font-medium">Elementi mostrati</p>
+        <Select
+          :model-value="`${table.getState().pagination.pageSize}`"
+          @update:model-value="(value) => table.setPageSize(Number(value))"
+        >
+          <SelectTrigger class="h-8 w-[70px]">
+            <SelectValue
+              :placeholder="`${table.getState().pagination.pageSize}`"
+            />
+          </SelectTrigger>
+          <SelectContent side="top">
+            <SelectItem
+              v-for="pageSize in [10, 20, 30, 40, 50]"
+              :key="pageSize"
+              :value="`${pageSize}`"
+            >
+              {{ pageSize }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div
+        class="flex w-[100px] items-center justify-center text-sm font-medium"
       >
-        <span class="sr-only">Pagina precedente</span>
-        <ChevronLeft class="w-4 h-4" />
-      </Button>
-      <Button
-        variant="outline"
-        class="w-8 h-8 p-0"
-        :disabled="!table.getCanNextPage()"
-        @click="table.nextPage()"
-      >
-        <span class="sr-only">Pagina successiva</span>
-        <ChevronRight class="w-4 h-4" />
-      </Button>
-      <Button
-        variant="outline"
-        class="hidden w-8 h-8 p-0 lg:flex"
-        :disabled="!table.getCanNextPage()"
-        @click="table.setPageIndex(table.getPageCount() - 1)"
-      >
-        <span class="sr-only">Vai all'ultima pagina</span>
-        <ChevronsRight class="w-4 h-4" />
-      </Button>
+        Pagina {{ table.getState().pagination.pageIndex + 1 }} di
+        {{ table.getPageCount() }}
+      </div>
+      <div class="flex items-center gap-2">
+        <Button
+          variant="outline"
+          class="hidden p-0 size-8 lg:flex"
+          :disabled="!table.getCanPreviousPage()"
+          @click="table.setPageIndex(0)"
+        >
+          <span class="sr-only">Vai alla prima pagina</span>
+          <ChevronsLeft class="w-4 h-4" />
+        </Button>
+        <Button
+          variant="outline"
+          class="p-0 size-8"
+          :disabled="!table.getCanPreviousPage()"
+          @click="table.previousPage()"
+        >
+          <span class="sr-only">Pagina precedente</span>
+          <ChevronLeft class="w-4 h-4" />
+        </Button>
+        <Button
+          variant="outline"
+          class="p-0 size-8"
+          :disabled="!table.getCanNextPage()"
+          @click="table.nextPage()"
+        >
+          <span class="sr-only">Pagina successiva</span>
+          <ChevronRight class="w-4 h-4" />
+        </Button>
+        <Button
+          variant="outline"
+          class="hidden p-0 size-8 lg:flex"
+          :disabled="!table.getCanNextPage()"
+          @click="table.setPageIndex(table.getPageCount() - 1)"
+        >
+          <span class="sr-only">Vai all'ultima pagina</span>
+          <ChevronsRight class="w-4 h-4" />
+        </Button>
+      </div>
     </div>
   </div>
 </template>
