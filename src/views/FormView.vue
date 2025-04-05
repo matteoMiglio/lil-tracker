@@ -9,18 +9,17 @@
   <div class="flex-1 p-8">
     <Card>
       <CardHeader>
-        <CardTitle>Add Transaction</CardTitle>
-        <CardDescription>Record a new income or expense</CardDescription>
+        <CardTitle>Add new transaction</CardTitle>
       </CardHeader>
       <form @submit.prevent="handleSubmit">
         <CardContent class="space-y-4">
           <div class="space-y-2">
-            <Label for="type">Transaction Type</Label>
+            <Label for="kind">Type</Label>
             <RadioGroup
-              id="type"
+              id="kind"
               class="flex gap-4"
               :defaultValue="'expense'"
-              v-model="transactionType"
+              v-model="transactionKind"
             >
               <div class="flex items-center space-x-2">
                 <RadioGroupItem value="expense" id="expense" />
@@ -28,7 +27,7 @@
                   for="expense"
                   :class="[
                     'cursor-pointer rounded-md px-3 py-1',
-                    transactionType === 'expense'
+                    transactionKind === 'expense'
                       ? 'bg-destructive/10 text-destructive font-medium'
                       : '',
                   ]"
@@ -42,7 +41,7 @@
                   for="income"
                   :class="[
                     'cursor-pointer rounded-md px-3 py-1',
-                    transactionType === 'income'
+                    transactionKind === 'income'
                       ? 'bg-green-500/10 text-green-600 font-medium'
                       : '',
                   ]"
@@ -58,22 +57,18 @@
             <div class="relative">
               <span
                 class="absolute -translate-y-1/2 left-3 top-1/2 text-muted-foreground"
-                >$</span
+                >€</span
               >
               <Input
                 id="amount"
                 type="number"
                 step="0.1"
                 min="0"
-                placeholder="0.00"
+                placeholder="0,00"
                 class="pl-8"
+                v-model="amount"
               />
             </div>
-          </div>
-
-          <div class="space-y-2">
-            <Label for="description">Description</Label>
-            <Input id="description" placeholder="What was this for?" />
           </div>
 
           <div class="space-y-2">
@@ -88,11 +83,17 @@
                   ]"
                 >
                   <CalendarIcon class="w-4 h-4 mr-2" />
-                  {{ date ? formatDate(date) : "Select date" }}
+                  {{ date ? formatDateValue(date) : "Seleziona data" }}
                 </Button>
               </PopoverTrigger>
               <PopoverContent class="w-auto p-0">
-                <Calendar mode="single" v-model="date" initialFocus />
+                <Calendar
+                  mode="single"
+                  v-model="date"
+                  initialFocus
+                  :locale="it.code"
+                  :week-starts-on="0"
+                />
               </PopoverContent>
             </Popover>
           </div>
@@ -100,17 +101,20 @@
         <CardFooter>
           <Button type="submit" class="w-full">
             <PlusCircleIcon class="w-4 h-4 mr-2" />
-            Add {{ transactionType }}
+            Add {{ transactionKind }}
           </Button>
         </CardFooter>
       </form>
     </Card>
   </div>
+  <Toaster />
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { format } from "date-fns";
+import { it } from "date-fns/locale";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "vue-sonner";
 import {
   Card,
   CardHeader,
@@ -131,25 +135,44 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, PlusCircleIcon } from "lucide-vue-next";
 import MainNav from "@/components/MainNav.vue";
+import { formatLongDateString, formatDateValue } from "@/lib/formatters";
+import {
+  type DateValue,
+  today,
+  getLocalTimeZone,
+} from "@internationalized/date";
 
-// Reactive state
-const transactionType = ref("expense");
-const date = ref(null);
-const selectedCategory = ref("");
+const transactionKind = ref("expense");
+const date = ref<DateValue>(today(getLocalTimeZone()));
+const amount = ref(null);
 
-// Format date for display
-const formatDate = (dateValue) => {
-  return format(dateValue, "PPP");
-};
-
-// Form submission handler
 const handleSubmit = () => {
-  // Implement your form submission logic here
   console.log({
-    type: transactionType.value,
-    // Add other form values here
-    category: selectedCategory.value,
-    date: date.value,
+    amount: amount.value,
+    kind: transactionKind.value,
+    date: date.value.toString(),
   });
+
+  if (!amount.value || !date.value) {
+    console.debug("Please fill all fields");
+    return;
+  }
+
+  const now = new Date();
+
+  try {
+    toast.success("Transazione registrata", {
+      description: formatLongDateString(now),
+    });
+
+    amount.value = null;
+    transactionKind.value = "expense";
+    date.value = today(getLocalTimeZone());
+    // Reset the form
+  } catch (error) {
+    toast.error("Error", {
+      description: "Something went wrong",
+    });
+  }
 };
 </script>
