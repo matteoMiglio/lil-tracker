@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -48,10 +48,6 @@ const formattedTotalRevenue = computed(() =>
 const formattedTotalExpenses = computed(() =>
   currencyFormatter.format(totalExpenses.value)
 );
-
-onMounted(() => {
-  store.fetchData();
-});
 </script>
 
 <template>
