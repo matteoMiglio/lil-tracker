@@ -57,6 +57,17 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: "description",
     header: () => h("div", "Descrizione"),
     cell: ({ row }) => {
+      const description = row.getValue("description");
+      if (!description) {
+        return h("div", "-");
+      }
+      if (description.length > 50) {
+        return h("div", description.slice(0, 50) + "...");
+      }
+      if (description.length === 0) {
+        return h("div", "-");
+      }
+
       return h("div", row.getValue("description"));
     },
   },
