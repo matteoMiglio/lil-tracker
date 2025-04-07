@@ -34,29 +34,25 @@ export const useTransactionsStore = defineStore("transactions", {
       try {
         console.debug("Adding new transaction");
 
-        // const response = await fetch(`${API_BASE_URL}/transactions`, {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify(item),
-        // });
+        const response = await fetch(`${API_BASE_URL}/transactions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.newItem),
+        });
 
-        // console.debug("Response Status:", response.status);
+        console.debug("Response Status:", response.status);
 
-        // if (!response.ok) {
-        //   throw new Error(
-        //     "Si è verificato un errore durante la creazione di una nuova transazione"
-        //   );
-        // }
+        if (!response.ok) {
+          throw new Error(
+            "Si è verificato un errore durante la creazione di una nuova transazione"
+          );
+        }
 
-        // const rawTransaction = (await response.json()) as Transaction;
+        const rawTransaction = (await response.json()) as Transaction;
 
-        // this.transactions.push(rawTransaction);
-        this.transactions.push({
-          ...this.newItem,
-          id: crypto.randomUUID(),
-        } as Transaction);
+        this.transactions.push(rawTransaction);
 
         this.error = null;
       } catch (error: any) {
@@ -68,18 +64,15 @@ export const useTransactionsStore = defineStore("transactions", {
     async delete(id: string) {
       console.debug("Deleting transaction:", id);
       try {
-        // const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
-        //   method: "DELETE",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        // });
+        const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+          method: "DELETE",
+        });
 
-        // console.debug("Response Status:", response.status);
+        console.debug("Response Status:", response.status);
 
-        // if (response.status !== 204) {
-        //   throw new Error("Failed to delete transaction");
-        // }
+        if (response.status !== 204) {
+          throw new Error("Failed to delete transaction");
+        }
 
         this.transactions = this.transactions.filter((item) => item.id !== id);
 
@@ -94,9 +87,9 @@ export const useTransactionsStore = defineStore("transactions", {
       console.debug("Fetching transactions...");
 
       try {
-        const transactions: Transaction[] = generateFakeTransactions(2);
-        // const response = await fetch(`${API_BASE_URL}/transactions`);
-        // const transactions: Transaction[] = await response.json();
+        // const transactions: Transaction[] = generateFakeTransactions(2);
+        const response = await fetch(`${API_BASE_URL}/transactions`);
+        const transactions: Transaction[] = await response.json();
 
         console.info("Fetched", transactions.length, "transactions");
 
