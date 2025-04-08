@@ -1,18 +1,14 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "@/views/HomeView.vue";
+import LoginView from "@/views/LoginView.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // {
-    //   path: "/:pathMatch(.*)*",
-    //   component: () => import("@/views/PageNotFoundView.vue"),
-    // },
-    // { path: '/choose-season', name: 'ChooseSeason', component: ChooseSeasonView },
     {
       path: "/",
       name: "home",
-      component: HomeView,
+      component: () => import("@/views/HomeView.vue"),
       meta: {
         breadcrumb: "Home",
       },
@@ -25,19 +21,27 @@ const router = createRouter({
         breadcrumb: "Form",
       },
     },
+    {
+      path: "/login",
+      name: "login",
+      component: LoginView,
+      meta: {
+        breadcrumb: "Login",
+      },
+    },
   ],
 });
 
-// router.beforeEach((to, from, next) => {
-//   const seasonStore = useSeasonStore()
-//   const activeSeason = seasonStore.getActiveSeason
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  const isLoggedIn = authStore.isLoggedIn;
 
-//   if (!activeSeason && to.name !== 'ChooseSeason') {
-//     // Redirect to the season selection page if no active season
-//     next({ name: 'ChooseSeason' })
-//   } else {
-//     next()
-//   }
-// })
+  if (!isLoggedIn && to.name !== "login") {
+    // Redirect to the login page if the user is not logged in
+    next({ name: "login" });
+  } else {
+    next();
+  }
+});
 
 export default router;
