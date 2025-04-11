@@ -24,7 +24,7 @@ export default async function categoryRoutes(fastify: FastifyInstance) {
   // Update a category
   fastify.put("/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
-    const { name } = request.body as { name: string };
+    const { name } = request.body as { id: string; name: string };
 
     const category = await prisma.category.update({
       where: { id },

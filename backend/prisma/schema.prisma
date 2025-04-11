@@ -23,7 +23,7 @@ model Transaction {
   description String?
   kind        TransactionKind
   categoryId  String?
-  category    Category?  @relation(fields: [categoryId], references: [id])
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 }
 
 enum TransactionKind {
