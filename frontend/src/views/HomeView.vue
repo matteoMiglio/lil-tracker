@@ -54,9 +54,7 @@ const formattedTotalExpenses = computed(() =>
 <template>
   <div class="flex-col w-full h-full">
     <div class="border-b">
-      <div class="flex items-center justify-center h-16 px-4">
-        <MainNav class="mx-6" />
-      </div>
+      <MainNav />
     </div>
     <div class="flex flex-col gap-4 px-6 py-4">
       <div class="flex items-center justify-between">

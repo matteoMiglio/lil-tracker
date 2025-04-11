@@ -1,9 +1,7 @@
 <template>
   <div class="flex-col w-full h-full">
     <div class="border-b">
-      <div class="flex items-center justify-center h-16 px-4">
-        <MainNav class="mx-6" />
-      </div>
+      <MainNav />
     </div>
   </div>
   <div class="flex items-center justify-center p-8">
