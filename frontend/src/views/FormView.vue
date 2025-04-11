@@ -82,6 +82,24 @@
           </div>
 
           <div class="space-y-2">
+            <Label for="category">Categoria</Label>
+            <Select v-model="newItem.categoryId" id="category">
+              <SelectTrigger>
+                <SelectValue placeholder="Seleziona una categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="category in categories"
+                  :key="category.id"
+                  :value="category.id"
+                >
+                  {{ category.name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div class="space-y-2">
             <Label for="date">Data</Label>
             <Popover>
               <PopoverTrigger as-child>
@@ -151,6 +169,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, PlusCircleIcon } from "lucide-vue-next";
 import MainNav from "@/components/MainNav.vue";
@@ -161,17 +188,20 @@ import {
   getLocalTimeZone,
 } from "@internationalized/date";
 import { useTransactionsStore } from "@/stores/transactions";
+import { useCategoriesStore } from "@/stores/categories";
 import { Transaction } from "@/types/transaction";
 import { storeToRefs } from "pinia";
 
 const store = useTransactionsStore();
+const categoriesStore = useCategoriesStore();
+const { categories } = storeToRefs(categoriesStore);
 
 const { newItem } = storeToRefs(store);
 const date = ref<DateValue>(today(getLocalTimeZone()));
 
 newItem.value.date = date.value.toString();
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   console.log(newItem.value);
 
   if (!newItem.value.amount || !date.value) {
@@ -182,13 +212,12 @@ const handleSubmit = () => {
   const now = new Date();
 
   try {
-    store.add();
+    await store.add();
 
     toast.success("Transazione registrata", {
       description: formatLongDateString(now),
     });
 
-    // Reset the form
     store.resetNewItem();
     date.value = today(getLocalTimeZone());
     newItem.value.date = date.value.toString();

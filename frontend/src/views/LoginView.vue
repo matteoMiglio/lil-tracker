@@ -27,8 +27,6 @@ const handleSubmit = async () => {
 
   if (authStore.isLoggedIn) {
     router.push({ name: "home" });
-  } else {
-    console.error("Login failed");
   }
 };
 </script>

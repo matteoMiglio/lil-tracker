@@ -72,6 +72,28 @@ export const columns: ColumnDef<Transaction>[] = [
     },
   },
   {
+    accessorKey: "category",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Categoria", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => {
+      const category = row.original.category?.name;
+
+      if (!category) {
+        return h("div", "-");
+      }
+
+      return h("div", category);
+    },
+  },
+  {
     accessorKey: "amount",
     header: ({ column }) => {
       return h(
