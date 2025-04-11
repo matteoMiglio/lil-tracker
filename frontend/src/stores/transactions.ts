@@ -12,6 +12,7 @@ export const useTransactionsStore = defineStore("transactions", {
       date: null,
       description: null,
       kind: "expense",
+      categoryId: null,
     } as Omit<Transaction, "id">,
     errors: {} as { [key: string]: string },
     loading: false,
@@ -87,7 +88,7 @@ export const useTransactionsStore = defineStore("transactions", {
       console.debug("Fetching transactions...");
 
       try {
-        // const transactions: Transaction[] = generateFakeTransactions(2);
+        // const transactions: Transaction[] = generateFakeTransactions(2000);
         const response = await fetch(`${API_BASE_URL}/transactions`);
         const transactions: Transaction[] = await response.json();
 
@@ -112,6 +113,7 @@ export const useTransactionsStore = defineStore("transactions", {
         date: null,
         description: null,
         kind: "expense",
+        categoryId: null,
       } as Omit<Transaction, "id">;
     },
   },
