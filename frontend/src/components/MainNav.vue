@@ -21,5 +21,12 @@ import { RouterLink } from "vue-router";
     >
       Form
     </RouterLink>
+    <RouterLink
+      to="/categories"
+      class="font-medium transition-colors text-muted-foreground"
+      active-class="text-primary"
+    >
+      Categorie
+    </RouterLink>
   </nav>
 </template>

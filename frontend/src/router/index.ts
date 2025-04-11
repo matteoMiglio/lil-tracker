@@ -22,6 +22,14 @@ const router = createRouter({
       },
     },
     {
+      path: "/categories",
+      name: "categories",
+      component: () => import("@/views/CategoryView.vue"),
+      meta: {
+        breadcrumb: "Categories",
+      },
+    },
+    {
       path: "/login",
       name: "login",
       component: LoginView,

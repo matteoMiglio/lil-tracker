@@ -66,6 +66,43 @@ export const useCategoriesStore = defineStore("categories", {
         console.error(error);
       }
     },
+    async update(updatedCategory: Category) {
+      console.debug("Updating category:", updatedCategory.id);
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/categories/${updatedCategory.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedCategory),
+          }
+        );
+
+        console.debug("Response Status:", response.status);
+
+        if (!response.ok) {
+          throw new Error(
+            "Si è verificato un errore durante l'aggiornamento della categoria"
+          );
+        }
+
+        const updatedCategoryResponse = (await response.json()) as Category;
+
+        const index = this.categories.findIndex(
+          (item) => item.id === updatedCategory.id
+        );
+        if (index !== -1) {
+          this.categories[index] = updatedCategoryResponse;
+        }
+
+        this.error = null;
+      } catch (error: any) {
+        this.error = error;
+        console.error(error);
+      }
+    },
     async fetchData() {
       this.loading = true;
       console.debug("Fetching categories...");
