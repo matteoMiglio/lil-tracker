@@ -9,19 +9,22 @@ const props = defineProps<{
 
 // Group transactions by category and calculate the total for each category
 const groupedByCategory = props.transactions.reduce(
-  (acc, transaction) => {
-    if (!acc[transaction.categoryId]) {
-      acc[transaction.categoryId] = {
-        name: transaction.category?.name || "Non specificata",
+  (acc, { categoryId, category, kind, amount }) => {
+    const categoryKey = categoryId || "unspecified";
+    if (!acc[categoryKey]) {
+      acc[categoryKey] = {
+        name: category?.name || "Non specificata",
         entrate: 0,
         uscite: 0,
       };
     }
 
-    acc[transaction.categoryId].entrate +=
-      transaction.kind === "income" ? transaction.amount : 0;
-    acc[transaction.categoryId].uscite +=
-      transaction.kind === "expense" ? transaction.amount : 0;
+    if (kind === "income") {
+      acc[categoryKey].entrate += amount;
+    } else if (kind === "expense") {
+      acc[categoryKey].uscite += amount;
+    }
+
     return acc;
   },
   {} as Record<string, { name: string; entrate: number; uscite: number }>
