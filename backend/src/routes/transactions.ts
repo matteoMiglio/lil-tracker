@@ -8,18 +8,24 @@ interface Transaction {
   amount: number | null;
   date: string | null;
   description: string | null;
+  categoryId?: string;
+  category?: {
+    id: string;
+    name: string;
+  };
   kind: "income" | "expense";
 }
 
 export default async function transactionRoutes(fastify: FastifyInstance) {
   // 1. GET /transactions - List all transactions
-  fastify.get("/transactions", async (request, reply) => {
-    const transactions = await prisma.transaction.findMany();
-    return transactions;
+  fastify.get("/", async () => {
+    return prisma.transaction.findMany({
+      include: { category: true },
+    });
   });
 
   // 2. GET /transactions/:id - Get a specific transaction by ID
-  fastify.get("/transactions/:id", async (request, reply) => {
+  fastify.get("/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
     const transaction = await prisma.transaction.findUnique({
       where: { id },
@@ -33,8 +39,9 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
   });
 
   // 3. POST /transactions - Create a new transaction
-  fastify.post("/transactions", async (request, reply) => {
-    const { amount, date, description, kind } = request.body as Transaction;
+  fastify.post("/", async (request, reply) => {
+    const { amount, date, description, kind, categoryId } =
+      request.body as Transaction;
 
     const parsedAmount =
       typeof amount === "string" ? parseFloat(amount) : amount;
@@ -60,8 +67,12 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
       data: {
         amount: parsedAmount,
         date,
-        description,
         kind,
+        description: description ?? null,
+        categoryId: categoryId ?? null,
+      },
+      include: {
+        category: true,
       },
     });
 
@@ -69,7 +80,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
   });
 
   // 4. PUT /transactions/:id - Update an existing transaction
-  fastify.put("/transactions/:id", async (request, reply) => {
+  fastify.put("/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
     const { amount, date, description, kind } = request.body as Transaction;
 
@@ -87,7 +98,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
   });
 
   // 5. DELETE /transactions/:id - Delete a transaction by ID
-  fastify.delete("/transactions/:id", async (request, reply) => {
+  fastify.delete("/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
 
     try {
