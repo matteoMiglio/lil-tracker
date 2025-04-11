@@ -11,7 +11,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/sonner";
 import MainNav from "@/components/MainNav.vue";
-import Overview from "@/components/chart/Overview.vue";
+import OverviewChart from "@/components/overview-chart/Overview.vue";
+import CategoriesChart from "@/components/categories-chart/Overview.vue";
 import RecentTransactions from "@/components/RecentTransactions.vue";
 import DataTable from "@/components/table/DataTable.vue";
 import { DollarSign } from "lucide-vue-next";
@@ -126,17 +127,15 @@ const formattedTotalExpenses = computed(() =>
                   <CardTitle>Overview</CardTitle>
                 </CardHeader>
                 <CardContent class="pl-2">
-                  <Overview :incomes="incomes" :expenses="expenses" />
+                  <OverviewChart :incomes="incomes" :expenses="expenses" />
                 </CardContent>
               </Card>
               <Card class="md:col-span-2 lg:col-span-3">
                 <CardHeader>
-                  <CardTitle>Transazioni recenti</CardTitle>
+                  <CardTitle>Categorie</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <RecentTransactions
-                    :transactions="transactions.slice(0, 10)"
-                  />
+                  <CategoriesChart :transactions="transactions" />
                 </CardContent>
               </Card>
             </div>
