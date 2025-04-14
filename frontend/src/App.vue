@@ -1,17 +1,26 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
 
 import { useTransactionsStore } from "@/stores/transactions";
 import { useCategoriesStore } from "@/stores/categories";
+import { useAuthStore } from "@/stores/auth"; // Make sure this path is correct
 
 const store = useTransactionsStore();
 const categoriesStore = useCategoriesStore();
+const authStore = useAuthStore();
 
-onMounted(async () => {
-  await store.fetchData();
-  await categoriesStore.fetchData();
-});
+// Watch for login status and fetch data when logged in
+watch(
+  () => authStore.isLoggedIn,
+  async (isLoggedIn) => {
+    if (isLoggedIn) {
+      await store.fetchData();
+      await categoriesStore.fetchData();
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
