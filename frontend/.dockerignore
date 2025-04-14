@@ -1,0 +1,33 @@
+# Ignore version control folders
+.git
+.vscode
+.nvmrc
+
+# Ignore dependencies (handled in container)
+node_modules
+bun.lockb
+package-lock.json
+
+# Ignore build output (dist should be generated inside the container)
+dist
+
+# Ignore local environment and config files
+.env
+.env.local
+.env.*.local
+.env.example
+
+# Ignore editor & system files
+.DS_Store
+.idea
+*.log
+npm-debug.log*
+
+# Ignore TypeScript config and test-related files
+tsconfig*.json
+vitest.config.ts
+tsconfig.vitest.json
+
+# Ignore unnecessary frontend files
+components.json
+README.md
