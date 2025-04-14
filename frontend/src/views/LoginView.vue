@@ -20,13 +20,19 @@ const password = ref("");
 
 const authStore = useAuthStore();
 
-const handleSubmit = async () => {
-  console.log("Form submitted");
+const error = ref<string | null>(null);
 
-  await authStore.login(username.value, password.value);
+const handleSubmit = async () => {
+  try {
+    await authStore.login(username.value, password.value);
+  } catch (err) {
+    error.value = "Login fallito, prova di nuovo";
+  }
 
   if (authStore.isLoggedIn) {
     router.push({ name: "home" });
+  } else {
+    password.value = "";
   }
 };
 </script>
@@ -46,6 +52,9 @@ const handleSubmit = async () => {
           <div class="grid gap-2">
             <Label for="password">Password</Label>
             <Input id="password" type="password" v-model="password" required />
+          </div>
+          <div v-if="error && !password.length" class="text-sm text-red-500">
+            {{ error }}
           </div>
           <Button type="submit" class="w-full"> Login </Button>
         </div>
