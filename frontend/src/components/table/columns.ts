@@ -30,8 +30,7 @@ export const columns: ColumnDef<Transaction>[] = [
     enableHiding: false,
   },
   {
-    id: "date",
-    accessorFn: (row) => row.date,
+    accessorKey: "date",
     header: ({ column }) => {
       return h(
         Button,
@@ -39,7 +38,7 @@ export const columns: ColumnDef<Transaction>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Data", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Data", h(ArrowUpDown, { class: "size-4" })]
       );
     },
     cell: ({ row }) => {
@@ -48,6 +47,7 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "id",
+    filterFn: "includesString",
     header: () => h("div", "ID"),
     cell: ({ row }) => {
       return h("div", row.getValue("id"));
@@ -55,24 +55,24 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "description",
+    filterFn: "includesString",
     header: () => h("div", "Descrizione"),
     cell: ({ row }) => {
-      const description = row.getValue("description");
+      const description = row.original.description;
       if (!description) {
         return h("div", "-");
       }
       if (description.length > 50) {
         return h("div", description.slice(0, 50) + "...");
       }
-      if (description.length === 0) {
-        return h("div", "-");
-      }
-
-      return h("div", row.getValue("description"));
+      return h("div", description);
     },
   },
   {
     accessorKey: "category",
+    filterFn: (row, id, value) => {
+      return value.includes(row.original.category?.id);
+    },
     header: ({ column }) => {
       return h(
         Button,
@@ -80,7 +80,7 @@ export const columns: ColumnDef<Transaction>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Categoria", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Categoria", h(ArrowUpDown, { class: "size-4" })]
       );
     },
     cell: ({ row }) => {
@@ -102,7 +102,7 @@ export const columns: ColumnDef<Transaction>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Ammontare", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Ammontare", h(ArrowUpDown, { class: "size-4" })]
       );
     },
     cell: ({ row }) => {

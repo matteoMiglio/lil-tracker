@@ -1,5 +1,10 @@
 <template>
   <div class="flex flex-col gap-4">
+    <DataTableToolbar
+      :table="table"
+      :filter-columns-list="filterColumnsList"
+      :filter-column-search="filterColumnSearch"
+    />
     <div class="border rounded-md">
       <Table>
         <TableHeader>
@@ -80,11 +85,12 @@ import {
 import { ref, toRef } from "vue";
 import { valueUpdater } from "@/lib/utils";
 
+import DataTableToolbar from "./Toolbar.vue";
 import DataTablePagination from "./Pagination.vue";
 import type { Transaction } from "@/types/transaction";
 
 import { columns } from "./columns";
-import type { Row } from "@tanstack/vue-table";
+import { filterColumnsList, filterColumnSearch } from "./filters";
 
 const props = defineProps<{
   data: Transaction[];
