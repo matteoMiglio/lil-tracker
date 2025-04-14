@@ -7,8 +7,7 @@
       <!-- Add Category Card -->
       <Card>
         <CardHeader>
-          <CardTitle> Add Category </CardTitle>
-          <CardDescription> Create a new category </CardDescription>
+          <CardTitle> Aggiungi una categoria </CardTitle>
         </CardHeader>
         <CardContent>
           <form @submit.prevent="handleAddCategory" class="space-y-4">
@@ -24,7 +23,7 @@
               </div>
               <Button type="submit">
                 <Plus class="size-4" />
-                Add
+                Aggiungi
               </Button>
             </div>
           </form>
@@ -45,32 +44,36 @@
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-for="category in categories" :key="category.id">
-                <TableCell>{{ category.name }}</TableCell>
-                <TableCell class="flex items-center justify-end gap-2">
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    @click="openEditDialog(category)"
-                  >
-                    <Edit class="size-4" />
-                    <span class="sr-only">Edit</span>
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    @click="handleDeleteCategory(category.id)"
-                  >
-                    <Trash2 class="size-4" />
-                    <span class="sr-only">Delete</span>
-                  </Button>
-                </TableCell>
-              </TableRow>
-              <TableRow v-if="categories.length === 0">
-                <TableCell colspan="2" class="text-center">
-                  Nessuna categoria trovata. Crea una nuova categoria!
-                </TableCell>
-              </TableRow>
+              <template v-if="categories.length">
+                <TableRow v-for="category in categories" :key="category.id">
+                  <TableCell>{{ category.name }}</TableCell>
+                  <TableCell class="flex items-center justify-end gap-2">
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      @click="openEditDialog(category)"
+                    >
+                      <Edit class="size-4" />
+                      <span class="sr-only">Edit</span>
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      @click="handleDeleteCategory(category.id)"
+                    >
+                      <Trash2 class="size-4" />
+                      <span class="sr-only">Delete</span>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </template>
+              <template v-else>
+                <TableRow>
+                  <TableCell :colspan="2" class="h-24 text-center">
+                    Nessuna categoria trovata. Aggiungi una nuova categoria!
+                  </TableCell>
+                </TableRow>
+              </template>
             </TableBody>
           </Table>
         </CardContent>
