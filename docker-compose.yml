@@ -8,6 +8,7 @@ services:
       - sqlite-data:/app/prisma
     environment:
       - DATABASE_URL=file:/app/prisma/dev.db
+      - DEFAULT_ADMIN_PASSWORD=yourSecurePasswordHere
     restart: unless-stopped
 
   frontend:
