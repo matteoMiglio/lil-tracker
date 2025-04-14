@@ -1,0 +1,23 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    expose:
+      - "31000" # Internal only
+    volumes:
+      - sqlite-data:/app/prisma
+    environment:
+      - DATABASE_URL=file:/app/prisma/dev.db
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  sqlite-data:
