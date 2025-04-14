@@ -44,7 +44,7 @@
               </TableRow>
             </TableHeader>
             <TableBody>
-              <template v-if="categories.length">
+              <template v-if="categories && categories.length">
                 <TableRow v-for="category in categories" :key="category.id">
                   <TableCell>{{ category.name }}</TableCell>
                   <TableCell class="flex items-center justify-end gap-2">
