@@ -1,5 +1,5 @@
 # Build Stage
-FROM node:22.9 AS build-stage
+FROM node:22.14-slim AS build-stage
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build-only
 
 # Production Stage
-FROM nginx:latest AS production-stage
+FROM nginx:1.27 AS production-stage
 
 # Copy built files to the standard Nginx directory
 COPY --from=build-stage /app/dist /usr/share/nginx/html
