@@ -15,8 +15,8 @@ app.register(categoryRoutes, { prefix: "/categories" });
 
 const start = async () => {
   try {
-    await app.listen({ port: 31000 });
-    console.log("🚀 Server running at http://localhost:31000");
+    await app.listen({ port: 31000, host: "0.0.0.0" });
+    console.log("🚀 Server running!");
   } catch (err) {
     app.log.error(err);
     process.exit(1);
