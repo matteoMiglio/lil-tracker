@@ -66,6 +66,11 @@
                   </Button>
                 </TableCell>
               </TableRow>
+              <TableRow v-if="categories.length === 0">
+                <TableCell colspan="2" class="text-center">
+                  Nessuna categoria trovata. Crea una nuova categoria!
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </CardContent>
