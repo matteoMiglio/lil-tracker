@@ -15,8 +15,8 @@ watch(
   () => authStore.isLoggedIn,
   async (isLoggedIn) => {
     if (isLoggedIn) {
-      await store.fetchData();
-      await categoriesStore.fetchData();
+      const promises = [store.fetchData(), categoriesStore.fetchData()];
+      await Promise.all(promises);
     }
   },
   { immediate: true }
