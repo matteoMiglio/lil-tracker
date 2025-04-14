@@ -6,9 +6,6 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-vue-next";
-import { useTransactionsStore } from "@/stores/transactions";
-import { toast } from "vue-sonner";
-
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -19,7 +16,6 @@ import {
 } from "@/components/ui/select";
 import { Trash2 } from "lucide-vue-next";
 
-import { formatLongDateString } from "@/lib/formatters";
 import type { Transaction } from "@/types/transaction";
 
 interface DataTablePaginationProps {
@@ -27,54 +23,13 @@ interface DataTablePaginationProps {
 }
 
 const props = defineProps<DataTablePaginationProps>();
-
-const store = useTransactionsStore();
-
-const deleteTransactions = () => {
-  if (props.table.getSelectedRowModel().rows.length) {
-    let error = null;
-    props.table.getSelectedRowModel().rows.forEach((row) => {
-      if (!row.original?.id) return;
-      try {
-        store.delete(row.original.id);
-      } catch (err) {
-        error = err;
-        toast.error("Error", {
-          description: "Something went wrong",
-        });
-      } finally {
-        if (!error) {
-          props.table.toggleAllRowsSelected(false);
-          const now = new Date();
-          toast.success("Transazioni cancellate", {
-            description: formatLongDateString(now),
-          });
-        }
-      }
-    });
-  } else {
-    console.warn("No rows selected");
-  }
-};
 </script>
 
 <template>
-  <div class="flex flex-row flex-wrap justify-between gap-2">
-    <div class="flex items-center gap-2">
-      <Button
-        variant="destructive"
-        type="button"
-        size="sm"
-        v-if="table.getSelectedRowModel().rows.length"
-        @click="deleteTransactions"
-      >
-        Elimina
-        <Trash2 class="size-4" />
-      </Button>
-      <div class="flex-1 text-sm text-muted-foreground">
-        {{ table.getFilteredSelectedRowModel().rows.length }} di
-        {{ table.getFilteredRowModel().rows.length }} righe selezionate.
-      </div>
+  <div class="flex flex-row flex-wrap items-center justify-between gap-2">
+    <div class="text-sm text-muted-foreground">
+      {{ table.getFilteredSelectedRowModel().rows.length }} di
+      {{ table.getFilteredRowModel().rows.length }} righe selezionate
     </div>
     <div class="flex items-center justify-end gap-6 lg:gap-8">
       <div class="flex items-center gap-2">

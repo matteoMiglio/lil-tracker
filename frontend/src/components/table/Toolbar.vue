@@ -5,8 +5,12 @@ import DataTableFacetedFilter from "./FacedetFilter.vue";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X, Plus, RotateCw, Trash2 } from "lucide-vue-next";
-import { toast } from "@/components/ui/toast";
+import { toast } from "vue-sonner";
 import type { Transaction } from "@/types/transaction";
+import { useTransactionsStore } from "@/stores/transactions";
+import { formatLongDateString } from "@/lib/formatters";
+
+const store = useTransactionsStore();
 
 const props = defineProps<{
   table: Table<Transaction>;
@@ -18,40 +22,32 @@ const isFiltered = computed(
   () => props.table.getState().columnFilters.length > 0
 );
 
-watch(
-  () => props.table.getState().columnFilters,
-  (newVal) => {
-    console.log("🧪 Active column filters:", newVal);
-  },
-  { immediate: true }
-);
-
-// const deleteReservation = () => {
-//   if (props.table.getSelectedRowModel().rows.length) {
-//     let error = null
-//     props.table.getSelectedRowModel().rows.forEach(row => {
-//       if (!row.original?.id) return
-//       try {
-//         store.delete(row.original.id)
-//       } catch (err) {
-//         handleError(err)
-//         error = err
-//       } finally {
-//         if (!error) {
-//           props.table.toggleAllRowsSelected(false)
-//           const now = new Date()
-//           toast({
-//             title: 'Prenotazioni cancellata',
-//             description:
-//               'La prenotazioni sono state cancellate con successo alle ' + now.toLocaleTimeString()
-//           })
-//         }
-//       }
-//     })
-//   } else {
-//     console.warn('No rows selected')
-//   }
-// }
+const deleteTransactions = () => {
+  if (props.table.getSelectedRowModel().rows.length) {
+    let error = null;
+    props.table.getSelectedRowModel().rows.forEach((row) => {
+      if (!row.original?.id) return;
+      try {
+        store.delete(row.original.id);
+      } catch (err) {
+        error = err;
+        toast.error("Error", {
+          description: "Something went wrong",
+        });
+      } finally {
+        if (!error) {
+          props.table.toggleAllRowsSelected(false);
+          const now = new Date();
+          toast.success("Transazioni cancellate", {
+            description: formatLongDateString(now),
+          });
+        }
+      }
+    });
+  } else {
+    console.warn("No rows selected");
+  }
+};
 </script>
 
 <template>
@@ -104,8 +100,9 @@ watch(
           variant="destructive"
           size="sm"
           class="h-8"
-          @click="handleDeleteEvent"
+          @click="deleteTransactions"
         >
+          Elimina righe
           <Trash2 class="size-4" />
         </Button>
       </div>
