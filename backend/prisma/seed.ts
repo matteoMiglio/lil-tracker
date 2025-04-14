@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const seed = async () => {
-  // Get the password from the environment variable
   const password = process.env.DEFAULT_ADMIN_PASSWORD;
 
   if (!password) {
@@ -12,10 +11,17 @@ const seed = async () => {
     process.exit(1);
   }
 
-  // Hash the password
+  const existingUser = await prisma.user.findUnique({
+    where: { username: "admin" },
+  });
+
+  if (existingUser) {
+    console.log("Admin user already exists. Skipping creation.");
+    return;
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Create a default user
   await prisma.user.create({
     data: {
       username: "admin",
@@ -23,12 +29,12 @@ const seed = async () => {
     },
   });
 
-  console.log("Database seeded successfully!");
+  console.log("Admin user created successfully!");
 };
 
 seed()
   .catch((e) => {
-    console.error(e);
+    console.error("Seeding failed:", e);
     process.exit(1);
   })
   .finally(async () => {
