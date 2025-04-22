@@ -13,7 +13,6 @@ import { Toaster } from "@/components/ui/sonner";
 import MainNav from "@/components/MainNav.vue";
 import OverviewChart from "@/components/overview-chart/Overview.vue";
 import CategoriesChart from "@/components/categories-chart/Overview.vue";
-import RecentTransactions from "@/components/RecentTransactions.vue";
 import DataTable from "@/components/table/DataTable.vue";
 import { DollarSign } from "lucide-vue-next";
 import { currencyFormatter } from "@/lib/formatters";

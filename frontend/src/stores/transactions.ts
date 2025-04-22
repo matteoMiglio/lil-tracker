@@ -10,6 +10,7 @@ export const useTransactionsStore = defineStore("transactions", {
     newItem: {
       amount: null,
       date: null,
+      time: null,
       description: null,
       kind: "expense",
       categoryId: null,
@@ -88,7 +89,6 @@ export const useTransactionsStore = defineStore("transactions", {
       console.debug("Fetching transactions...");
 
       try {
-        // const transactions: Transaction[] = generateFakeTransactions(2000);
         const response = await fetch(`${API_BASE_URL}/transactions`);
         const transactions: Transaction[] = await response.json();
 
@@ -111,6 +111,7 @@ export const useTransactionsStore = defineStore("transactions", {
       this.newItem = {
         amount: null,
         date: null,
+        time: null,
         description: null,
         kind: "expense",
         categoryId: null,

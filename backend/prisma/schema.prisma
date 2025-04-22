@@ -20,6 +20,7 @@ model Transaction {
   id          String     @id @default(cuid())
   amount      Float?
   date        String?
+  time        String? @default("03:00")
   description String?
   kind        TransactionKind
   categoryId  String?

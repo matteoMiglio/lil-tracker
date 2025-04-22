@@ -10,8 +10,8 @@
         <CardTitle>Aggiungi nuova transazione</CardTitle>
       </CardHeader>
       <form @submit.prevent="handleSubmit">
-        <CardContent class="space-y-4">
-          <div class="space-y-2">
+        <CardContent class="flex flex-col gap-6">
+          <div class="flex flex-col gap-2">
             <Label for="kind">Tipo</Label>
             <RadioGroup
               id="kind"
@@ -50,7 +50,7 @@
             </RadioGroup>
           </div>
 
-          <div class="space-y-2">
+          <div class="flex flex-col gap-2">
             <Label for="amount">Ammontare</Label>
             <div class="relative">
               <span
@@ -69,7 +69,7 @@
             </div>
           </div>
 
-          <div class="space-y-2">
+          <div class="flex flex-col gap-2">
             <Label for="description">Descrizione</Label>
             <Input
               id="description"
@@ -79,7 +79,7 @@
             />
           </div>
 
-          <div class="space-y-2">
+          <div class="flex flex-col gap-2">
             <Label for="category">Categoria</Label>
             <Select v-model="newItem.categoryId" id="category">
               <SelectTrigger>
@@ -97,40 +97,46 @@
             </Select>
           </div>
 
-          <div class="space-y-2">
-            <Label for="date">Data</Label>
-            <Popover>
-              <PopoverTrigger as-child>
-                <Button
-                  variant="outline"
-                  :class="[
-                    'w-full justify-start text-left font-normal',
-                    !date && 'text-muted-foreground',
-                  ]"
-                >
-                  <CalendarIcon class="w-4 h-4 mr-2" />
-                  {{ date ? formatDateValue(date) : "Seleziona data" }}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent class="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  v-model="date"
-                  initialFocus
-                  :locale="it.code"
-                  :week-starts-on="0"
-                  @update:model-value="
-                    (v) => {
-                      if (v) {
-                        newItem.date = v.toString();
-                      } else {
-                        newItem.date = null;
+          <div class="flex gap-2">
+            <div class="flex flex-col w-full gap-2">
+              <Label for="date">Data</Label>
+              <Popover>
+                <PopoverTrigger as-child>
+                  <Button
+                    variant="outline"
+                    :class="[
+                      'w-full justify-start text-left font-normal',
+                      !date && 'text-muted-foreground',
+                    ]"
+                  >
+                    <CalendarIcon class="w-4 h-4 mr-2" />
+                    {{ date ? formatDateValue(date) : "Seleziona data" }}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent class="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    v-model="date"
+                    initialFocus
+                    :locale="it.code"
+                    :week-starts-on="0"
+                    @update:model-value="
+                      (v) => {
+                        if (v) {
+                          newItem.date = v.toString();
+                        } else {
+                          newItem.date = null;
+                        }
                       }
-                    }
-                  "
-                />
-              </PopoverContent>
-            </Popover>
+                    "
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div class="flex flex-col gap-2">
+              <Label for="time">Ora</Label>
+              <Input id="time" type="time" v-model="newItem.time" />
+            </div>
           </div>
         </CardContent>
         <CardFooter>
@@ -177,14 +183,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, PlusCircleIcon } from "lucide-vue-next";
+import { CalendarIcon, PlusCircleIcon, Clock } from "lucide-vue-next";
 import MainNav from "@/components/MainNav.vue";
 import { formatLongDateString, formatDateValue } from "@/lib/formatters";
-import {
-  type DateValue,
-  today,
-  getLocalTimeZone,
-} from "@internationalized/date";
+import { type DateValue, parseDate } from "@internationalized/date";
+import { format } from "date-fns";
 import { useTransactionsStore } from "@/stores/transactions";
 import { useCategoriesStore } from "@/stores/categories";
 import { Transaction } from "@/types/transaction";
@@ -195,14 +198,17 @@ const categoriesStore = useCategoriesStore();
 const { categories } = storeToRefs(categoriesStore);
 
 const { newItem } = storeToRefs(store);
-const date = ref<DateValue>(today(getLocalTimeZone()));
+
+const today = new Date();
+
+const date = ref<DateValue>(parseDate(format(today, "yyyy-MM-dd")));
+const time = ref(format(today, "HH:mm"));
 
 newItem.value.date = date.value.toString();
+newItem.value.time = time.value;
 
 const handleSubmit = async () => {
-  console.log(newItem.value);
-
-  if (!newItem.value.amount || !date.value) {
+  if (!newItem.value.amount || !newItem.value.date || !newItem.value.time) {
     console.debug("Please fill all fields");
     return;
   }
@@ -217,8 +223,12 @@ const handleSubmit = async () => {
     });
 
     store.resetNewItem();
-    date.value = today(getLocalTimeZone());
+
+    date.value = parseDate(format(today, "yyyy-MM-dd"));
+    time.value = format(now, "HH:mm");
+
     newItem.value.date = date.value.toString();
+    newItem.value.time = time.value;
   } catch (error) {
     toast.error("Error", {
       description: "Something went wrong",

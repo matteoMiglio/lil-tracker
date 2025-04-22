@@ -7,6 +7,7 @@ interface Transaction {
   id: string;
   amount: number | null;
   date: string | null;
+  time: string | null;
   description: string | null;
   categoryId?: string;
   category?: {
@@ -40,7 +41,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
 
   // 3. POST /transactions - Create a new transaction
   fastify.post("/", async (request, reply) => {
-    const { amount, date, description, kind, categoryId } =
+    const { amount, date, time, description, kind, categoryId } =
       request.body as Transaction;
 
     const parsedAmount =
@@ -59,6 +60,9 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
     if (typeof date !== "string") {
       return reply.status(400).send({ message: "Invalid date" });
     }
+    if (typeof time !== "string") {
+      return reply.status(400).send({ message: "Invalid time" });
+    }
     if (kind !== "income" && kind !== "expense") {
       return reply.status(400).send({ message: "Invalid kind" });
     }
@@ -67,6 +71,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
       data: {
         amount: parsedAmount,
         date,
+        time,
         kind,
         description: description ?? null,
         categoryId: categoryId ?? null,
@@ -82,13 +87,15 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
   // 4. PUT /transactions/:id - Update an existing transaction
   fastify.put("/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
-    const { amount, date, description, kind } = request.body as Transaction;
+    const { amount, date, time, description, kind } =
+      request.body as Transaction;
 
     const transaction = await prisma.transaction.update({
       where: { id },
       data: {
         amount,
         date,
+        time,
         description,
         kind,
       },

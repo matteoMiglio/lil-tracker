@@ -46,6 +46,27 @@ export const columns: ColumnDef<Transaction>[] = [
     },
   },
   {
+    accessorKey: "time",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Orario", h(ArrowUpDown, { class: "size-4" })]
+      );
+    },
+    cell: ({ row }) => {
+      const time = row.getValue("time");
+      if (!time) {
+        return h("div", "04:00");
+      } else {
+        return h("div", time);
+      }
+    },
+  },
+  {
     accessorKey: "id",
     filterFn: "includesString",
     header: () => h("div", "ID"),
