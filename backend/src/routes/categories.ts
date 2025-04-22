@@ -6,7 +6,11 @@ const prisma = new PrismaClient();
 export default async function categoryRoutes(fastify: FastifyInstance) {
   // Get all categories
   fastify.get("/", async () => {
-    return prisma.category.findMany();
+    return prisma.category.findMany({
+      where: {
+        deletedAt: null,
+      },
+    });
   });
 
   // Create a category
@@ -33,13 +37,14 @@ export default async function categoryRoutes(fastify: FastifyInstance) {
     return category;
   });
 
-  // Delete a category
+  // Soft-delete a category
   fastify.delete("/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
 
     try {
-      await prisma.category.delete({
+      await prisma.category.update({
         where: { id },
+        data: { deletedAt: new Date() },
       });
       return reply.status(204).send(); // No content response for successful delete
     } catch (error) {

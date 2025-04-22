@@ -10,30 +10,39 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Category {
-  id          String        @id @default(cuid())
-  name        String
-  transactions Transaction[]
-}
-
-model Transaction {
-  id          String     @id @default(cuid())
-  amount      Float?
-  date        String?
-  time        String? @default("03:00")
-  description String?
-  kind        TransactionKind
-  categoryId  String?
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-}
-
-model User {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  password  String
-}
-
 enum TransactionKind {
   income
   expense
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  name         String
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
+  deletedAt    DateTime?
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  amount      Float?
+  date        String?
+  time        String?         @default("03:00")
+  description String?
+  kind        TransactionKind
+  categoryId  String?
+  category    Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @default(now()) @updatedAt
+  deletedAt   DateTime?
+}
+
+model User {
+  id        String    @id @default(cuid())
+  username  String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt 
+  deletedAt DateTime?
 }

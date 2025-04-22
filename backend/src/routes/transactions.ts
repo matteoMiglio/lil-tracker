@@ -22,6 +22,9 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
   fastify.get("/", async () => {
     return prisma.transaction.findMany({
       include: { category: true },
+      where: {
+        deletedAt: null,
+      },
     });
   });
 
@@ -104,13 +107,14 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
     return transaction;
   });
 
-  // 5. DELETE /transactions/:id - Delete a transaction by ID
+  // 5. DELETE /transactions/:id - Soft-delete a transaction by ID
   fastify.delete("/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
 
     try {
-      await prisma.transaction.delete({
+      await prisma.transaction.update({
         where: { id },
+        data: { deletedAt: new Date() },
       });
       return reply.status(204).send(); // No content response for successful delete
     } catch (error) {
