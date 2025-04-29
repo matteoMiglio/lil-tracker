@@ -6,9 +6,8 @@ services:
       - "31000" # Internal only
     volumes:
       - sqlite-data:/app/prisma
-    environment:
-      - DATABASE_URL=file:/app/prisma/dev.db
-      - DEFAULT_ADMIN_PASSWORD=yourSecurePasswordHere
+    env_file:
+      - .env
     restart: unless-stopped
 
   frontend:
