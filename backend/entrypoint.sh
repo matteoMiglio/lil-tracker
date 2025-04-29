@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p prisma/database
+
 # Run Prisma Generate (for making sure schema is updated)
 bunx prisma generate
 

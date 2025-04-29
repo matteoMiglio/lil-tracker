@@ -84,6 +84,6 @@ You may need to update the API URL in the frontend to point to your local backen
 
 The backend uses a `.env` file to configure the database:
 
-`DATABASE_URL="file:./prisma/dev.db"`
+`DATABASE_URL="file:./prisma/database/dev.db"`
 
 This is handled automatically by Docker Compose. For custom setups, ensure this path points to your SQLite file.

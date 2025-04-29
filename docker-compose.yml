@@ -5,7 +5,7 @@ services:
     expose:
       - "31000" # Internal only
     volumes:
-      - sqlite-data:/app/prisma
+      - ./data:/app/prisma/database
     env_file:
       - .env
     restart: unless-stopped
