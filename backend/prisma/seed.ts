@@ -15,12 +15,29 @@ const seed = async () => {
     where: { username: "admin" },
   });
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   if (existingUser) {
-    console.log("Admin user already exists. Skipping creation.");
+    const isSamePassword = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+
+    if (isSamePassword) {
+      console.log(
+        "Admin user already exists with the correct password. Skipping update."
+      );
+      return;
+    }
+
+    await prisma.user.update({
+      where: { username: "admin" },
+      data: { password: hashedPassword },
+    });
+
+    console.log("Admin user's password was updated.");
     return;
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
 
   await prisma.user.create({
     data: {
