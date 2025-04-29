@@ -7,3 +7,8 @@
 
 # Finder (MacOS) folder config
 .DS_Store
+
+# database
+*.sqlite
+*.sqlite3
+*.db
