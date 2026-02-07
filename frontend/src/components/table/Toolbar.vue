@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Table } from "@tanstack/vue-table";
-import { ref, computed, watch } from "vue";
+import { computed } from "vue";
 import DataTableFacetedFilter from "./FacedetFilter.vue";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { X, Plus, RotateCw, Trash2 } from "lucide-vue-next";
+import { X, Trash2 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import type { Transaction } from "@/types/transaction";
 import { useTransactionsStore } from "@/stores/transactions";
@@ -24,7 +24,7 @@ const isFiltered = computed(
 
 const deleteTransactions = () => {
   if (props.table.getSelectedRowModel().rows.length) {
-    let error = null;
+    let error: unknown = null;
     props.table.getSelectedRowModel().rows.forEach((row) => {
       if (!row.original?.id) return;
       try {
@@ -37,9 +37,8 @@ const deleteTransactions = () => {
       } finally {
         if (!error) {
           props.table.toggleAllRowsSelected(false);
-          const now = new Date();
           toast.success("Transazioni cancellate", {
-            description: formatLongDateString(now),
+            description: formatLongDateString(new Date().toISOString()),
           });
         }
       }

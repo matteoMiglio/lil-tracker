@@ -1,8 +1,6 @@
 import { defineStore } from "pinia";
 import type { Transaction } from "@/types/transaction";
-import { generateFakeTransactions } from "@/lib/fakeData";
-
-const API_BASE_URL = "/api";
+import { apiFetch } from "@/lib/api";
 
 export const useTransactionsStore = defineStore("transactions", {
   state: () => ({
@@ -22,25 +20,23 @@ export const useTransactionsStore = defineStore("transactions", {
   getters: {
     getIncomes(state) {
       return state.transactions.filter(
-        (transaction) => transaction.kind === "income"
+        (transaction) => transaction.kind === "income",
       );
     },
     getExpenses(state) {
       return state.transactions.filter(
-        (transaction) => transaction.kind === "expense"
+        (transaction) => transaction.kind === "expense",
       );
     },
   },
   actions: {
     async add() {
+      this.loading = true;
       try {
         console.debug("Adding new transaction");
 
-        const response = await fetch(`${API_BASE_URL}/transactions`, {
+        const response = await apiFetch("/transactions", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify(this.newItem),
         });
 
@@ -48,7 +44,7 @@ export const useTransactionsStore = defineStore("transactions", {
 
         if (!response.ok) {
           throw new Error(
-            "Si è verificato un errore durante la creazione di una nuova transazione"
+            "Si è verificato un errore durante la creazione di una nuova transazione",
           );
         }
 
@@ -61,12 +57,15 @@ export const useTransactionsStore = defineStore("transactions", {
         this.error = error;
         console.error(error.message);
         throw error.message;
+      } finally {
+        this.loading = false;
       }
     },
     async delete(id: string) {
+      this.loading = true;
       console.debug("Deleting transaction:", id);
       try {
-        const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+        const response = await apiFetch(`/transactions/${id}`, {
           method: "DELETE",
         });
 
@@ -82,6 +81,8 @@ export const useTransactionsStore = defineStore("transactions", {
       } catch (error: any) {
         this.error = error;
         console.error(error);
+      } finally {
+        this.loading = false;
       }
     },
     async fetchData() {
@@ -89,7 +90,7 @@ export const useTransactionsStore = defineStore("transactions", {
       console.debug("Fetching transactions...");
 
       try {
-        const response = await fetch(`${API_BASE_URL}/transactions`);
+        const response = await apiFetch("/transactions");
         const transactions: Transaction[] = await response.json();
 
         console.info("Fetched", transactions.length, "transactions");
@@ -102,9 +103,7 @@ export const useTransactionsStore = defineStore("transactions", {
         console.error(error);
         throw new Error("Errore nel caricamento delle prenotazioni");
       } finally {
-        setTimeout(() => {
-          this.loading = false;
-        }, 300);
+        this.loading = false;
       }
     },
     resetNewItem() {

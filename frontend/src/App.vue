@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
-import { onMounted, watch } from "vue";
+import { watch } from "vue";
 
 import { useTransactionsStore } from "@/stores/transactions";
 import { useCategoriesStore } from "@/stores/categories";

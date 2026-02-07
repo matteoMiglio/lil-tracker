@@ -1,13 +1,12 @@
 import { defineStore } from "pinia";
 import type { Category } from "@/types/category";
-
-const API_BASE_URL = "/api";
+import { apiFetch } from "@/lib/api";
 
 export const useCategoriesStore = defineStore("categories", {
   state: () => ({
     categories: [] as Category[],
     newItem: {
-      name: null,
+      name: "",
     } as Omit<Category, "id">,
     errors: {} as { [key: string]: string },
     loading: false,
@@ -15,14 +14,12 @@ export const useCategoriesStore = defineStore("categories", {
   }),
   actions: {
     async add() {
+      this.loading = true;
       try {
         console.debug("Adding new category");
 
-        const response = await fetch(`${API_BASE_URL}/categories`, {
+        const response = await apiFetch("/categories", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify(this.newItem),
         });
 
@@ -30,7 +27,7 @@ export const useCategoriesStore = defineStore("categories", {
 
         if (!response.ok) {
           throw new Error(
-            "Si è verificato un errore durante la creazione di una nuova categoria"
+            "Si è verificato un errore durante la creazione di una nuova categoria",
           );
         }
 
@@ -43,12 +40,15 @@ export const useCategoriesStore = defineStore("categories", {
         this.error = error;
         console.error(error.message);
         throw error.message;
+      } finally {
+        this.loading = false;
       }
     },
     async delete(id: string) {
+      this.loading = true;
       console.debug("Deleting category:", id);
       try {
-        const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
+        const response = await apiFetch(`/categories/${id}`, {
           method: "DELETE",
         });
 
@@ -64,34 +64,34 @@ export const useCategoriesStore = defineStore("categories", {
       } catch (error: any) {
         this.error = error;
         console.error(error);
+      } finally {
+        this.loading = false;
       }
     },
     async update(updatedCategory: Category) {
+      this.loading = true;
       console.debug("Updating category:", updatedCategory.id);
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/categories/${updatedCategory.id}`,
+        const response = await apiFetch(
+          `/categories/${updatedCategory.id}`,
           {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
             body: JSON.stringify(updatedCategory),
-          }
+          },
         );
 
         console.debug("Response Status:", response.status);
 
         if (!response.ok) {
           throw new Error(
-            "Si è verificato un errore durante l'aggiornamento della categoria"
+            "Si è verificato un errore durante l'aggiornamento della categoria",
           );
         }
 
         const updatedCategoryResponse = (await response.json()) as Category;
 
         const index = this.categories.findIndex(
-          (item) => item.id === updatedCategory.id
+          (item) => item.id === updatedCategory.id,
         );
         if (index !== -1) {
           this.categories[index] = updatedCategoryResponse;
@@ -101,6 +101,8 @@ export const useCategoriesStore = defineStore("categories", {
       } catch (error: any) {
         this.error = error;
         console.error(error);
+      } finally {
+        this.loading = false;
       }
     },
     async fetchData() {
@@ -108,8 +110,7 @@ export const useCategoriesStore = defineStore("categories", {
       console.debug("Fetching categories...");
 
       try {
-        // const categories: Category[] = generateFakeCategorys(20);
-        const response = await fetch(`${API_BASE_URL}/categories`);
+        const response = await apiFetch("/categories");
         const categories: Category[] = await response.json();
 
         console.info("Fetched", categories.length, "categories");
@@ -122,14 +123,12 @@ export const useCategoriesStore = defineStore("categories", {
         console.error(error);
         throw new Error("Errore nel caricamento delle categorie");
       } finally {
-        setTimeout(() => {
-          this.loading = false;
-        }, 300);
+        this.loading = false;
       }
     },
     resetNewItem() {
       this.newItem = {
-        name: null,
+        name: "",
       } as Omit<Category, "id">;
     },
   },
