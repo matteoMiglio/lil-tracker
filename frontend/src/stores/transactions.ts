@@ -12,6 +12,7 @@ export const useTransactionsStore = defineStore("transactions", {
       description: null,
       kind: "expense",
       categoryId: null,
+      seasonId: null,
     } as Omit<Transaction, "id">,
     errors: {} as { [key: string]: string },
     loading: false,
@@ -87,12 +88,13 @@ export const useTransactionsStore = defineStore("transactions", {
         this.loading = false;
       }
     },
-    async fetchData() {
+    async fetchData(seasonId?: string) {
       this.loading = true;
       console.debug("Fetching transactions...");
 
       try {
-        const response = await apiFetch("/transactions");
+        const query = seasonId ? `?seasonId=${seasonId}` : "";
+        const response = await apiFetch(`/transactions${query}`);
         const transactions: Transaction[] = await response.json();
 
         console.info("Fetched", transactions.length, "transactions");
@@ -117,6 +119,7 @@ export const useTransactionsStore = defineStore("transactions", {
         description: null,
         kind: "expense",
         categoryId: null,
+        seasonId: null,
       } as Omit<Transaction, "id">;
     },
   },

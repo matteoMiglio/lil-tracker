@@ -8,6 +8,9 @@
     <Card class="w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Aggiungi nuova transazione</CardTitle>
+        <p v-if="activeSeason" class="text-sm text-muted-foreground">
+          Stagione: {{ activeSeason.name }}
+        </p>
       </CardHeader>
       <form @submit.prevent="handleSubmit">
         <CardContent class="flex flex-col gap-6">
@@ -167,7 +170,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, watchEffect } from "vue";
 import { it } from "date-fns/locale";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "vue-sonner";
@@ -202,13 +205,21 @@ import { type DateValue, parseDate } from "@internationalized/date";
 import { format } from "date-fns";
 import { useTransactionsStore } from "@/stores/transactions";
 import { useCategoriesStore } from "@/stores/categories";
+import { useSeasonsStore } from "@/stores/seasons";
 import { storeToRefs } from "pinia";
 
 const store = useTransactionsStore();
 const categoriesStore = useCategoriesStore();
+const seasonsStore = useSeasonsStore();
 const { categories } = storeToRefs(categoriesStore);
 
 const { newItem, loading } = storeToRefs(store);
+
+const activeSeason = computed(() => seasonsStore.activeSeason);
+
+watchEffect(() => {
+  newItem.value.seasonId = activeSeason.value?.id ?? null;
+});
 
 const today = new Date();
 

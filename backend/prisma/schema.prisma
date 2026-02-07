@@ -24,6 +24,16 @@ model Category {
   deletedAt    DateTime?
 }
 
+model Season {
+  id           String        @id @default(cuid())
+  name         String
+  active       Boolean       @default(false)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
+  deletedAt    DateTime?
+}
+
 model Transaction {
   id          String          @id @default(cuid())
   amount      Float?
@@ -33,6 +43,8 @@ model Transaction {
   kind        TransactionKind
   categoryId  String?
   category    Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  seasonId    String?
+  season      Season?         @relation(fields: [seasonId], references: [id], onDelete: SetNull)
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @default(now()) @updatedAt
   deletedAt   DateTime?

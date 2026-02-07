@@ -4,22 +4,24 @@ import { watch } from "vue";
 
 import { useTransactionsStore } from "@/stores/transactions";
 import { useCategoriesStore } from "@/stores/categories";
-import { useAuthStore } from "@/stores/auth"; // Make sure this path is correct
+import { useSeasonsStore } from "@/stores/seasons";
+import { useAuthStore } from "@/stores/auth";
 
 const store = useTransactionsStore();
 const categoriesStore = useCategoriesStore();
+const seasonsStore = useSeasonsStore();
 const authStore = useAuthStore();
 
-// Watch for login status and fetch data when logged in
 watch(
   () => authStore.isLoggedIn,
   async (isLoggedIn) => {
     if (isLoggedIn) {
-      const promises = [store.fetchData(), categoriesStore.fetchData()];
-      await Promise.all(promises);
+      await Promise.all([seasonsStore.fetchData(), categoriesStore.fetchData()]);
+      const activeSeason = seasonsStore.activeSeason;
+      await store.fetchData(activeSeason?.id);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>
 

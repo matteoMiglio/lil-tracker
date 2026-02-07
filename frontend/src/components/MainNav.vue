@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
-import { Home, Tag, ArrowUpDown, LogOut } from "lucide-vue-next";
+import { Home, Tag, ArrowUpDown, LogOut, CalendarDays } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/auth";
 
@@ -17,7 +17,7 @@ function handleLogout() {
 
 <template>
   <div class="flex items-center justify-between h-16 px-4">
-    <h1 class="text-xl font-bold text-primary">Lil-tracker</h1>
+    <RouterLink to="/" class="text-xl font-bold text-primary">Lil-tracker</RouterLink>
     <nav class="flex items-center gap-4 lg:gap-6">
       <Button
         asChild
@@ -52,6 +52,18 @@ function handleLogout() {
           <div class="flex items-center gap-2">
             <Tag class="size-4" />
             Categorie
+          </div>
+        </RouterLink>
+      </Button>
+      <Button
+        asChild
+        variant="ghost"
+        :class="{ 'bg-muted text-primary': route.path === '/seasons' }"
+      >
+        <RouterLink to="/seasons">
+          <div class="flex items-center gap-2">
+            <CalendarDays class="size-4" />
+            Stagioni
           </div>
         </RouterLink>
       </Button>

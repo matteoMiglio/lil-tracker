@@ -22,6 +22,7 @@ const createSchema = {
       description: { type: ["string", "null"] },
       kind: { type: "string", enum: ["income", "expense"] },
       categoryId: { type: ["string", "null"] },
+      seasonId: { type: ["string", "null"] },
     },
   },
 } as const;
@@ -37,6 +38,7 @@ const updateSchema = {
       description: { type: ["string", "null"] },
       kind: { type: "string", enum: ["income", "expense"] },
       categoryId: { type: ["string", "null"] },
+      seasonId: { type: ["string", "null"] },
     },
   },
 } as const;
@@ -44,11 +46,14 @@ const updateSchema = {
 export default async function transactionRoutes(fastify: FastifyInstance) {
   fastify.addHook("onRequest", fastify.authenticate);
 
-  fastify.get("/", async () => {
+  fastify.get("/", async (request) => {
+    const { seasonId } = request.query as { seasonId?: string };
+
     return prisma.transaction.findMany({
-      include: { category: true },
+      include: { category: true, season: true },
       where: {
         deletedAt: null,
+        ...(seasonId ? { seasonId } : {}),
       },
     });
   });
@@ -57,7 +62,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
     const { id } = request.params as { id: string };
     const transaction = await prisma.transaction.findFirst({
       where: { id, deletedAt: null },
-      include: { category: true },
+      include: { category: true, season: true },
     });
 
     if (!transaction) {
@@ -68,7 +73,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post("/", { schema: createSchema }, async (request, reply) => {
-    const { amount, date, time, description, kind, categoryId } =
+    const { amount, date, time, description, kind, categoryId, seasonId } =
       request.body as {
         amount: number;
         date: string;
@@ -76,6 +81,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
         description: string | null;
         kind: "income" | "expense";
         categoryId: string | null;
+        seasonId: string | null;
       };
 
     try {
@@ -87,9 +93,11 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
           kind,
           description: description ?? null,
           categoryId: categoryId ?? null,
+          seasonId: seasonId ?? null,
         },
         include: {
           category: true,
+          season: true,
         },
       });
 
@@ -103,7 +111,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
 
   fastify.put("/:id", { schema: updateSchema }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const { amount, date, time, description, kind, categoryId } =
+    const { amount, date, time, description, kind, categoryId, seasonId } =
       request.body as {
         amount?: number;
         date?: string;
@@ -111,6 +119,7 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
         description?: string | null;
         kind?: "income" | "expense";
         categoryId?: string | null;
+        seasonId?: string | null;
       };
 
     try {
@@ -123,9 +132,11 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
           description,
           kind,
           categoryId,
+          seasonId,
         },
         include: {
           category: true,
+          season: true,
         },
       });
 

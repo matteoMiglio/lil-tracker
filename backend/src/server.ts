@@ -5,6 +5,7 @@ import authPlugin from "@plugins/auth";
 import rootRoutes from "@routes/root";
 import transactionRoutes from "@routes/transactions";
 import categoryRoutes from "@routes/categories";
+import seasonRoutes from "@routes/seasons";
 import authRoutes from "@routes/auth";
 
 const app = Fastify({ logger: true });
@@ -18,6 +19,7 @@ app.register(rootRoutes);
 app.register(authRoutes);
 app.register(transactionRoutes, { prefix: "/transactions" });
 app.register(categoryRoutes, { prefix: "/categories" });
+app.register(seasonRoutes, { prefix: "/seasons" });
 
 const start = async () => {
   try {

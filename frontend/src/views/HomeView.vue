@@ -15,8 +15,12 @@ import DataTable from "@/components/table/DataTable.vue";
 import { DollarSign } from "lucide-vue-next";
 import { currencyFormatter } from "@/lib/formatters";
 import { useTransactionsStore } from "@/stores/transactions";
+import { useSeasonsStore } from "@/stores/seasons";
 
 const store = useTransactionsStore();
+const seasonsStore = useSeasonsStore();
+
+const activeSeason = computed(() => seasonsStore.activeSeason);
 
 const transactions = computed(() => store.transactions);
 
@@ -53,7 +57,21 @@ const formattedTotalExpenses = computed(() =>
     </div>
     <div class="flex flex-col gap-4 px-6 py-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <div class="flex items-center gap-3">
+          <h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <span
+            v-if="activeSeason"
+            class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
+          >
+            {{ activeSeason.name }}
+          </span>
+          <span
+            v-else
+            class="text-sm text-muted-foreground"
+          >
+            Nessuna stagione attiva
+          </span>
+        </div>
       </div>
       <Tabs default-value="overview" class="flex flex-col gap-4">
         <TabsList class="grid w-full grid-cols-3 md:w-72">

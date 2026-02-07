@@ -1,4 +1,5 @@
 import type { Category } from "./category";
+import type { Season } from "./season";
 type TransactionKind = "income" | "expense";
 
 interface Transaction {
@@ -10,6 +11,8 @@ interface Transaction {
   kind: TransactionKind;
   categoryId?: string | null;
   category?: Category;
+  seasonId?: string | null;
+  season?: Season;
 }
 
 export { type Transaction, type TransactionKind };

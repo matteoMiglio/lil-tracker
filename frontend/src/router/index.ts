@@ -30,6 +30,14 @@ const router = createRouter({
       },
     },
     {
+      path: "/seasons",
+      name: "seasons",
+      component: () => import("@/views/SeasonView.vue"),
+      meta: {
+        breadcrumb: "Seasons",
+      },
+    },
+    {
       path: "/login",
       name: "login",
       component: LoginView,
