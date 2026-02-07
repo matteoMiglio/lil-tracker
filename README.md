@@ -112,6 +112,18 @@ The frontend dev server runs on `http://localhost:5173` and proxies API requests
 | `JWT_SECRET` | Secret key for signing JWT tokens | `your-random-secret-string` |
 | `VITE_API_URL` | Backend URL for frontend dev server | `http://localhost:31000` |
 
+## Changing the Admin Password
+
+To change the admin password, update `DEFAULT_ADMIN_PASSWORD` in your `.env` file and restart the containers:
+
+```bash
+docker compose down
+# edit .env with the new password
+docker compose up -d --build
+```
+
+On startup, the seed script detects the password mismatch and updates the stored hash automatically.
+
 ## Backup & Restore
 
 Utility scripts are available in the `utils/` directory:
