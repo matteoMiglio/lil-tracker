@@ -1,20 +1,25 @@
 <script setup lang="ts">
 import type { Table } from "@tanstack/vue-table";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import DataTableFacetedFilter from "./FacedetFilter.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X, Trash2 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import type { Transaction } from "@/types/transaction";
 import { useTransactionsStore } from "@/stores/transactions";
+import { storeToRefs } from "pinia";
 import { formatLongDateString } from "@/lib/formatters";
 
 const store = useTransactionsStore();
+const { loading } = storeToRefs(store);
+
+const isConfirmOpen = ref(false);
 
 const props = defineProps<{
   table: Table<Transaction>;
-  filterColumnsList?: Array<{ column: string; title: string; options: any }>;
+  filterColumnsList?: Array<{ column: string; title: string; options: { value: string; label: string }[] }>;
   filterColumnSearch?: { column: string; title: string };
 }>();
 
@@ -22,36 +27,40 @@ const isFiltered = computed(
   () => props.table.getState().columnFilters.length > 0
 );
 
-const deleteTransactions = () => {
-  if (props.table.getSelectedRowModel().rows.length) {
-    let error: unknown = null;
-    props.table.getSelectedRowModel().rows.forEach((row) => {
-      if (!row.original?.id) return;
-      try {
-        store.delete(row.original.id);
-      } catch (err) {
-        error = err;
-        toast.error("Error", {
-          description: "Something went wrong",
-        });
-      } finally {
-        if (!error) {
-          props.table.toggleAllRowsSelected(false);
-          toast.success("Transazioni cancellate", {
-            description: formatLongDateString(new Date().toISOString()),
-          });
-        }
-      }
+const selectedCount = computed(
+  () => props.table.getFilteredSelectedRowModel().rows.length,
+);
+
+function promptDeleteTransactions() {
+  isConfirmOpen.value = true;
+}
+
+const deleteTransactions = async () => {
+  const rows = props.table.getSelectedRowModel().rows;
+  if (!rows.length) return;
+
+  try {
+    for (const row of rows) {
+      if (!row.original?.id) continue;
+      await store.delete(row.original.id);
+    }
+    props.table.toggleAllRowsSelected(false);
+    toast.success("Transazioni cancellate", {
+      description: formatLongDateString(new Date().toISOString()),
     });
-  } else {
-    console.warn("No rows selected");
+  } catch {
+    toast.error("Errore", {
+      description: "Qualcosa è andato storto",
+    });
+  } finally {
+    isConfirmOpen.value = false;
   }
 };
 </script>
 
 <template>
   <div
-    class="flex flex-row flex-wrap items-center justify-between gap-2 p-4 rounded-md shadow-sm bg-slate-50"
+    class="flex flex-row flex-wrap items-center justify-between gap-2 p-4 rounded-md shadow-sm bg-muted"
   >
     <div class="flex items-center flex-1 gap-4">
       <div v-if="props.filterColumnSearch">
@@ -62,7 +71,7 @@ const deleteTransactions = () => {
               .getColumn(filterColumnSearch?.column ?? '')
               ?.getFilterValue() as string) ?? ''
           "
-          class="h-8 w-[250px]"
+          class="h-8 w-full md:w-[250px]"
           @input="
             table
               .getColumn(filterColumnSearch?.column ?? '')
@@ -94,17 +103,26 @@ const deleteTransactions = () => {
     </div>
 
     <div class="flex flex-row gap-2">
-      <div v-if="table.getFilteredSelectedRowModel().rows.length">
+      <div v-if="selectedCount">
         <Button
           variant="destructive"
           size="sm"
           class="h-8"
-          @click="deleteTransactions"
+          :disabled="loading"
+          @click="promptDeleteTransactions"
         >
-          Elimina righe
+          Elimina righe ({{ selectedCount }})
           <Trash2 class="size-4" />
         </Button>
       </div>
     </div>
   </div>
+  <ConfirmDialog
+    :open="isConfirmOpen"
+    title="Eliminare transazioni?"
+    :description="`Verranno eliminate ${selectedCount} transazioni. Questa azione non può essere annullata.`"
+    :loading="loading"
+    @update:open="isConfirmOpen = $event"
+    @confirm="deleteTransactions"
+  />
 </template>

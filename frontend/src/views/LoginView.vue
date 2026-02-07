@@ -24,7 +24,7 @@ const error = ref<string | null>(null);
 const handleSubmit = async () => {
   try {
     await authStore.login(username.value, password.value);
-  } catch (err) {
+  } catch {
     error.value = "Login fallito, prova di nuovo";
   }
 

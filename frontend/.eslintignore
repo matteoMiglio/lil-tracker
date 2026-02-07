@@ -1,6 +1,0 @@
-# Ignore everything except src
-/*
-!src/
-
-# Exclude specific directories or files within src
-src/components/ui/*

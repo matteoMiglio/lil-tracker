@@ -63,11 +63,12 @@
                 step="0.1"
                 min="0"
                 placeholder="0,00"
-                class="pl-8"
+                :class="['pl-8', errors.amount && 'border-destructive focus-visible:ring-destructive']"
                 :model-value="newItem.amount ?? undefined"
-                @update:model-value="(v) => (newItem.amount = v ? Number(v) : null)"
+                @update:model-value="(v) => { newItem.amount = v ? Number(v) : null; if (submitted) validate(); }"
               />
             </div>
+            <p v-if="errors.amount" class="text-sm text-destructive">{{ errors.amount }}</p>
           </div>
 
           <div class="flex flex-col gap-2">
@@ -109,6 +110,7 @@
                     :class="[
                       'w-full justify-start text-left font-normal',
                       !date && 'text-muted-foreground',
+                      errors.date && 'border-destructive',
                     ]"
                   >
                     <CalendarIcon class="w-4 h-4 mr-2" />
@@ -130,26 +132,31 @@
                         } else {
                           newItem.date = null;
                         }
+                        if (submitted) validate();
                       }
                     "
                   />
                 </PopoverContent>
               </Popover>
+              <p v-if="errors.date" class="text-sm text-destructive">{{ errors.date }}</p>
             </div>
             <div class="flex flex-col gap-2">
               <Label for="time">Ora</Label>
               <Input
                 id="time"
                 type="time"
+                :class="[errors.time && 'border-destructive focus-visible:ring-destructive']"
                 :model-value="newItem.time ?? undefined"
-                @update:model-value="(v) => (newItem.time = v ? String(v) : null)"
+                @update:model-value="(v) => { newItem.time = v ? String(v) : null; if (submitted) validate(); }"
               />
+              <p v-if="errors.time" class="text-sm text-destructive">{{ errors.time }}</p>
             </div>
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" class="w-full">
-            <PlusCircleIcon class="w-4 h-4 mr-2" />
+          <Button type="submit" class="w-full" :disabled="loading">
+            <Loader2 v-if="loading" class="w-4 h-4 mr-2 animate-spin" />
+            <PlusCircleIcon v-else class="w-4 h-4 mr-2" />
             Aggiungi
           </Button>
         </CardFooter>
@@ -188,7 +195,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, PlusCircleIcon } from "lucide-vue-next";
+import { CalendarIcon, PlusCircleIcon, Loader2 } from "lucide-vue-next";
 import MainNav from "@/components/MainNav.vue";
 import { formatLongDateString, formatDateValue } from "@/lib/formatters";
 import { type DateValue, parseDate } from "@internationalized/date";
@@ -201,7 +208,7 @@ const store = useTransactionsStore();
 const categoriesStore = useCategoriesStore();
 const { categories } = storeToRefs(categoriesStore);
 
-const { newItem } = storeToRefs(store);
+const { newItem, loading } = storeToRefs(store);
 
 const today = new Date();
 
@@ -211,11 +218,27 @@ const time = ref(format(today, "HH:mm"));
 newItem.value.date = date.value.toString();
 newItem.value.time = time.value;
 
-const handleSubmit = async () => {
-  if (!newItem.value.amount || !newItem.value.date || !newItem.value.time) {
-    console.debug("Please fill all fields");
-    return;
+const errors = ref<{ amount?: string; date?: string; time?: string }>({});
+const submitted = ref(false);
+
+function validate(): boolean {
+  const e: typeof errors.value = {};
+  if (!newItem.value.amount || newItem.value.amount <= 0) {
+    e.amount = "Inserisci un importo valido";
   }
+  if (!newItem.value.date) {
+    e.date = "Seleziona una data";
+  }
+  if (!newItem.value.time) {
+    e.time = "Inserisci un orario";
+  }
+  errors.value = e;
+  return Object.keys(e).length === 0;
+}
+
+const handleSubmit = async () => {
+  submitted.value = true;
+  if (!validate()) return;
 
   const now = new Date();
 
@@ -227,15 +250,17 @@ const handleSubmit = async () => {
     });
 
     store.resetNewItem();
+    submitted.value = false;
+    errors.value = {};
 
     date.value = parseDate(format(today, "yyyy-MM-dd"));
     time.value = format(now, "HH:mm");
 
     newItem.value.date = date.value.toString();
     newItem.value.time = time.value;
-  } catch (error) {
-    toast.error("Error", {
-      description: "Something went wrong",
+  } catch {
+    toast.error("Errore", {
+      description: "Qualcosa è andato storto",
     });
   }
 };

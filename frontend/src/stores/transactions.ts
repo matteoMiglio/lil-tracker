@@ -53,10 +53,11 @@ export const useTransactionsStore = defineStore("transactions", {
         this.transactions.push(rawTransaction);
 
         this.error = null;
-      } catch (error: any) {
-        this.error = error;
-        console.error(error.message);
-        throw error.message;
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        this.error = message;
+        console.error(message);
+        throw message;
       } finally {
         this.loading = false;
       }
@@ -78,9 +79,10 @@ export const useTransactionsStore = defineStore("transactions", {
         this.transactions = this.transactions.filter((item) => item.id !== id);
 
         this.error = null;
-      } catch (error: any) {
-        this.error = error;
-        console.error(error);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        this.error = message;
+        console.error(message);
       } finally {
         this.loading = false;
       }
@@ -98,9 +100,10 @@ export const useTransactionsStore = defineStore("transactions", {
         this.transactions = transactions;
 
         this.error = null;
-      } catch (error: any) {
-        this.error = error;
-        console.error(error);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        this.error = message;
+        console.error(message);
         throw new Error("Errore nel caricamento delle prenotazioni");
       } finally {
         this.loading = false;
