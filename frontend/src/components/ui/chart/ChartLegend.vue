@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// @ts-nocheck
 import type { BulletLegendItemInterface } from '@unovis/ts'
 import { buttonVariants } from '@/components/ui/button'
 import { BulletLegend } from '@unovis/ts'

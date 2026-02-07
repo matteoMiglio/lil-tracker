@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { useRoute } from "vue-router"; // Import useRoute to get the current route
+import { useRoute, useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
-import { Home, Tag, ArrowUpDown } from "lucide-vue-next";
-import { Button } from "@/components/ui/button"; // Import the Button component
+import { Home, Tag, ArrowUpDown, LogOut } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/stores/auth";
 
-const route = useRoute(); // Get the current route
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+
+function handleLogout() {
+  authStore.logout();
+  router.push({ name: "login" });
+}
 </script>
 
 <template>
@@ -46,6 +54,12 @@ const route = useRoute(); // Get the current route
             Categorie
           </div>
         </RouterLink>
+      </Button>
+      <Button variant="ghost" @click="handleLogout">
+        <div class="flex items-center gap-2">
+          <LogOut class="size-4" />
+          Esci
+        </div>
       </Button>
     </nav>
   </div>
