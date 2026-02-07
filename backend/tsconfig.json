@@ -11,7 +11,8 @@
     "baseUrl": "./",
     "paths": {
       "@routes/*": ["src/routes/*"],
-      "@plugins/*": ["src/plugins/*"]
+      "@plugins/*": ["src/plugins/*"],
+      "@lib/*": ["src/lib/*"]
     },
 
     // Bundler mode

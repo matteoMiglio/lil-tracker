@@ -4,7 +4,6 @@ import { defineConfig, loadEnv } from "vite";
 import autoprefixer from "autoprefixer";
 import tailwind from "tailwindcss";
 import VueDevTools from "vite-plugin-vue-devtools";
-import { defineConfig } from "vite";
 
 export default defineConfig(({ mode }) => {
   // Load environment variables

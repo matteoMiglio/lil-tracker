@@ -3,11 +3,9 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,7 +56,7 @@ function handleSave() {
       <div class="grid gap-4 py-4">
         <div class="grid items-center grid-cols-4 gap-4">
           <Label for="name" class="text-right"> Name </Label>
-          <Input id="name" v-model="editingCategory.name" class="col-span-3" />
+          <Input id="name" v-model="editingCategory!.name" class="col-span-3" />
         </div>
       </div>
       <DialogFooter>

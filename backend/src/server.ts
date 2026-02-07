@@ -1,6 +1,7 @@
 // src/server.ts
 import Fastify from "fastify";
 import loggerPlugin from "@plugins/logger";
+import authPlugin from "@plugins/auth";
 import rootRoutes from "@routes/root";
 import transactionRoutes from "@routes/transactions";
 import categoryRoutes from "@routes/categories";
@@ -8,8 +9,11 @@ import authRoutes from "@routes/auth";
 
 const app = Fastify({ logger: true });
 
-// Register plugins and routes
+// Register plugins
 app.register(loggerPlugin);
+app.register(authPlugin);
+
+// Register routes
 app.register(rootRoutes);
 app.register(authRoutes);
 app.register(transactionRoutes, { prefix: "/transactions" });

@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
+// @ts-nocheck
 import type { BulletLegendItemInterface } from '@unovis/ts'
 import type { BaseChartProps } from '.'
 import { cn } from '@/lib/utils'

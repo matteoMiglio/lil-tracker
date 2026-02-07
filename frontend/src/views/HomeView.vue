@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { Button } from "@/components/ui/button";
+import { computed } from "vue";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -16,9 +14,7 @@ import CategoriesChart from "@/components/categories-chart/Overview.vue";
 import DataTable from "@/components/table/DataTable.vue";
 import { DollarSign } from "lucide-vue-next";
 import { currencyFormatter } from "@/lib/formatters";
-import type { Transaction, TransactionKind } from "@/types/transaction";
 import { useTransactionsStore } from "@/stores/transactions";
-import { storeToRefs } from "pinia";
 
 const store = useTransactionsStore();
 
@@ -28,11 +24,11 @@ const incomes = computed(() => store.getIncomes);
 const expenses = computed(() => store.getExpenses);
 
 const totalRevenue = computed(() =>
-  incomes.value.reduce((sum, income) => sum + income.amount, 0)
+  incomes.value.reduce((sum, income) => sum + (income.amount ?? 0), 0),
 );
 
 const totalExpenses = computed(() =>
-  expenses.value.reduce((sum, expense) => sum + expense.amount, 0)
+  expenses.value.reduce((sum, expense) => sum + (expense.amount ?? 0), 0),
 );
 
 const balance = computed(() => {

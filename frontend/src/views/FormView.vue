@@ -64,7 +64,8 @@
                 min="0"
                 placeholder="0,00"
                 class="pl-8"
-                v-model="newItem.amount"
+                :model-value="newItem.amount ?? undefined"
+                @update:model-value="(v) => (newItem.amount = v ? Number(v) : null)"
               />
             </div>
           </div>
@@ -75,7 +76,8 @@
               id="description"
               type="text"
               placeholder="Aggiungi una breve descrizione"
-              v-model="newItem.description"
+              :model-value="newItem.description ?? undefined"
+              @update:model-value="(v) => (newItem.description = v ? String(v) : null)"
             />
           </div>
 
@@ -110,19 +112,20 @@
                     ]"
                   >
                     <CalendarIcon class="w-4 h-4 mr-2" />
-                    {{ date ? formatDateValue(date) : "Seleziona data" }}
+                    {{ date ? formatDateValue(date as DateValue) : "Seleziona data" }}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent class="w-auto p-0">
                   <Calendar
                     mode="single"
-                    v-model="date"
+                    :model-value="(date as DateValue)"
                     initialFocus
                     :locale="it.code"
                     :week-starts-on="0"
                     @update:model-value="
-                      (v) => {
+                      (v: DateValue | undefined) => {
                         if (v) {
+                          date = v;
                           newItem.date = v.toString();
                         } else {
                           newItem.date = null;
@@ -135,7 +138,12 @@
             </div>
             <div class="flex flex-col gap-2">
               <Label for="time">Ora</Label>
-              <Input id="time" type="time" v-model="newItem.time" />
+              <Input
+                id="time"
+                type="time"
+                :model-value="newItem.time ?? undefined"
+                @update:model-value="(v) => (newItem.time = v ? String(v) : null)"
+              />
             </div>
           </div>
         </CardContent>
@@ -160,7 +168,6 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
@@ -176,21 +183,18 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, PlusCircleIcon, Clock } from "lucide-vue-next";
+import { CalendarIcon, PlusCircleIcon } from "lucide-vue-next";
 import MainNav from "@/components/MainNav.vue";
 import { formatLongDateString, formatDateValue } from "@/lib/formatters";
 import { type DateValue, parseDate } from "@internationalized/date";
 import { format } from "date-fns";
 import { useTransactionsStore } from "@/stores/transactions";
 import { useCategoriesStore } from "@/stores/categories";
-import { Transaction } from "@/types/transaction";
 import { storeToRefs } from "pinia";
 
 const store = useTransactionsStore();
@@ -219,7 +223,7 @@ const handleSubmit = async () => {
     await store.add();
 
     toast.success("Transazione registrata", {
-      description: formatLongDateString(now),
+      description: formatLongDateString(now.toISOString()),
     });
 
     store.resetNewItem();
