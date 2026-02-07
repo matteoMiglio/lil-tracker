@@ -83,9 +83,9 @@
 
           <div class="flex flex-col gap-2">
             <Label for="category">Categoria</Label>
-            <Select v-model="newItem.categoryId" id="category">
+            <Select v-model="newItem.categoryId" id="category" :disabled="categories.length === 0">
               <SelectTrigger>
-                <SelectValue placeholder="Seleziona una categoria" />
+                <SelectValue :placeholder="categories.length === 0 ? 'Nessuna categoria disponibile' : 'Seleziona una categoria'" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
