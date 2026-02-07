@@ -1,10 +1,39 @@
-import { FastifyInstance } from "fastify";
-import { PrismaClient } from "@prisma/client";
+import type { FastifyInstance } from "fastify";
+import prisma from "@lib/prisma";
 
-const prisma = new PrismaClient();
+const paramsSchema = {
+  params: {
+    type: "object",
+    required: ["id"],
+    properties: {
+      id: { type: "string" },
+    },
+  },
+} as const;
+
+const createSchema = {
+  body: {
+    type: "object",
+    required: ["name"],
+    properties: {
+      name: { type: "string", minLength: 1 },
+    },
+  },
+} as const;
+
+const updateSchema = {
+  ...paramsSchema,
+  body: {
+    type: "object",
+    properties: {
+      name: { type: "string", minLength: 1 },
+    },
+  },
+} as const;
 
 export default async function categoryRoutes(fastify: FastifyInstance) {
-  // Get all categories
+  fastify.addHook("onRequest", fastify.authenticate);
+
   fastify.get("/", async () => {
     return prisma.category.findMany({
       where: {
@@ -13,32 +42,47 @@ export default async function categoryRoutes(fastify: FastifyInstance) {
     });
   });
 
-  // Create a category
-  fastify.post("/", async (req) => {
-    const body = req.body as { name: string };
-    return await prisma.category.create({ data: { name: body.name } });
+  fastify.post("/", { schema: createSchema }, async (request, reply) => {
+    const { name } = request.body as { name: string };
+    try {
+      const category = await prisma.category.create({ data: { name } });
+      return reply.status(201).send(category);
+    } catch {
+      return reply
+        .status(500)
+        .send({ message: "Failed to create category" });
+    }
   });
 
-  // Get a single category
-  fastify.get("/:id", async (req) => {
-    const { id } = req.params as { id: string };
-    return await prisma.category.findUnique({ where: { id } });
-  });
-
-  // Update a category
-  fastify.put("/:id", async (request, reply) => {
+  fastify.get("/:id", { schema: paramsSchema }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const { name } = request.body as { id: string; name: string };
-
-    const category = await prisma.category.update({
-      where: { id },
-      data: { name },
+    const category = await prisma.category.findFirst({
+      where: { id, deletedAt: null },
     });
+
+    if (!category) {
+      return reply.status(404).send({ message: "Category not found" });
+    }
+
     return category;
   });
 
-  // Soft-delete a category
-  fastify.delete("/:id", async (request, reply) => {
+  fastify.put("/:id", { schema: updateSchema }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const { name } = request.body as { name: string };
+
+    try {
+      const category = await prisma.category.update({
+        where: { id },
+        data: { name },
+      });
+      return category;
+    } catch {
+      return reply.status(404).send({ message: "Category not found" });
+    }
+  });
+
+  fastify.delete("/:id", { schema: paramsSchema }, async (request, reply) => {
     const { id } = request.params as { id: string };
 
     try {
@@ -46,8 +90,8 @@ export default async function categoryRoutes(fastify: FastifyInstance) {
         where: { id },
         data: { deletedAt: new Date() },
       });
-      return reply.status(204).send(); // No content response for successful delete
-    } catch (error) {
+      return reply.status(204).send();
+    } catch {
       return reply.status(404).send({ message: "Category not found" });
     }
   });

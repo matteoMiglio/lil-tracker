@@ -1,24 +1,49 @@
-import { FastifyInstance } from "fastify";
-import { PrismaClient } from "@prisma/client";
+import type { FastifyInstance } from "fastify";
+import prisma from "@lib/prisma";
 
-const prisma = new PrismaClient();
+const paramsSchema = {
+  params: {
+    type: "object",
+    required: ["id"],
+    properties: {
+      id: { type: "string" },
+    },
+  },
+} as const;
 
-interface Transaction {
-  id: string;
-  amount: number | null;
-  date: string | null;
-  time: string | null;
-  description: string | null;
-  categoryId?: string;
-  category?: {
-    id: string;
-    name: string;
-  };
-  kind: "income" | "expense";
-}
+const createSchema = {
+  body: {
+    type: "object",
+    required: ["amount", "date", "time", "kind"],
+    properties: {
+      amount: { type: "number", exclusiveMinimum: 0 },
+      date: { type: "string" },
+      time: { type: "string" },
+      description: { type: ["string", "null"] },
+      kind: { type: "string", enum: ["income", "expense"] },
+      categoryId: { type: ["string", "null"] },
+    },
+  },
+} as const;
+
+const updateSchema = {
+  ...paramsSchema,
+  body: {
+    type: "object",
+    properties: {
+      amount: { type: "number", exclusiveMinimum: 0 },
+      date: { type: "string" },
+      time: { type: "string" },
+      description: { type: ["string", "null"] },
+      kind: { type: "string", enum: ["income", "expense"] },
+      categoryId: { type: ["string", "null"] },
+    },
+  },
+} as const;
 
 export default async function transactionRoutes(fastify: FastifyInstance) {
-  // 1. GET /transactions - List all transactions
+  fastify.addHook("onRequest", fastify.authenticate);
+
   fastify.get("/", async () => {
     return prisma.transaction.findMany({
       include: { category: true },
@@ -28,11 +53,11 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
     });
   });
 
-  // 2. GET /transactions/:id - Get a specific transaction by ID
-  fastify.get("/:id", async (request, reply) => {
+  fastify.get("/:id", { schema: paramsSchema }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const transaction = await prisma.transaction.findUnique({
-      where: { id },
+    const transaction = await prisma.transaction.findFirst({
+      where: { id, deletedAt: null },
+      include: { category: true },
     });
 
     if (!transaction) {
@@ -42,73 +67,75 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
     return transaction;
   });
 
-  // 3. POST /transactions - Create a new transaction
-  fastify.post("/", async (request, reply) => {
+  fastify.post("/", { schema: createSchema }, async (request, reply) => {
     const { amount, date, time, description, kind, categoryId } =
-      request.body as Transaction;
+      request.body as {
+        amount: number;
+        date: string;
+        time: string;
+        description: string | null;
+        kind: "income" | "expense";
+        categoryId: string | null;
+      };
 
-    const parsedAmount =
-      typeof amount === "string" ? parseFloat(amount) : amount;
+    try {
+      const newTransaction = await prisma.transaction.create({
+        data: {
+          amount,
+          date,
+          time,
+          kind,
+          description: description ?? null,
+          categoryId: categoryId ?? null,
+        },
+        include: {
+          category: true,
+        },
+      });
 
-    if (typeof parsedAmount !== "number" || isNaN(parsedAmount)) {
-      return reply.status(400).send({ message: "Invalid amount" });
-    }
-
-    if (parsedAmount <= 0) {
+      return reply.status(201).send(newTransaction);
+    } catch {
       return reply
-        .status(400)
-        .send({ message: "Amount must be greater than 0" });
+        .status(500)
+        .send({ message: "Failed to create transaction" });
     }
-
-    if (typeof date !== "string") {
-      return reply.status(400).send({ message: "Invalid date" });
-    }
-    if (typeof time !== "string") {
-      return reply.status(400).send({ message: "Invalid time" });
-    }
-    if (kind !== "income" && kind !== "expense") {
-      return reply.status(400).send({ message: "Invalid kind" });
-    }
-
-    const newTransaction = await prisma.transaction.create({
-      data: {
-        amount: parsedAmount,
-        date,
-        time,
-        kind,
-        description: description ?? null,
-        categoryId: categoryId ?? null,
-      },
-      include: {
-        category: true,
-      },
-    });
-
-    return reply.status(201).send(newTransaction);
   });
 
-  // 4. PUT /transactions/:id - Update an existing transaction
-  fastify.put("/:id", async (request, reply) => {
+  fastify.put("/:id", { schema: updateSchema }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const { amount, date, time, description, kind } =
-      request.body as Transaction;
+    const { amount, date, time, description, kind, categoryId } =
+      request.body as {
+        amount?: number;
+        date?: string;
+        time?: string;
+        description?: string | null;
+        kind?: "income" | "expense";
+        categoryId?: string | null;
+      };
 
-    const transaction = await prisma.transaction.update({
-      where: { id },
-      data: {
-        amount,
-        date,
-        time,
-        description,
-        kind,
-      },
-    });
+    try {
+      const transaction = await prisma.transaction.update({
+        where: { id },
+        data: {
+          amount,
+          date,
+          time,
+          description,
+          kind,
+          categoryId,
+        },
+        include: {
+          category: true,
+        },
+      });
 
-    return transaction;
+      return transaction;
+    } catch {
+      return reply.status(404).send({ message: "Transaction not found" });
+    }
   });
 
-  // 5. DELETE /transactions/:id - Soft-delete a transaction by ID
-  fastify.delete("/:id", async (request, reply) => {
+  fastify.delete("/:id", { schema: paramsSchema }, async (request, reply) => {
     const { id } = request.params as { id: string };
 
     try {
@@ -116,8 +143,8 @@ export default async function transactionRoutes(fastify: FastifyInstance) {
         where: { id },
         data: { deletedAt: new Date() },
       });
-      return reply.status(204).send(); // No content response for successful delete
-    } catch (error) {
+      return reply.status(204).send();
+    } catch {
       return reply.status(404).send({ message: "Transaction not found" });
     }
   });
