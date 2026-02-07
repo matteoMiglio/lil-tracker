@@ -20,9 +20,9 @@ const groupedByCategory = props.transactions.reduce(
     }
 
     if (kind === "income") {
-      acc[categoryKey].entrate += amount;
+      acc[categoryKey].entrate += amount ?? 0;
     } else if (kind === "expense") {
-      acc[categoryKey].uscite += amount;
+      acc[categoryKey].uscite += amount ?? 0;
     }
 
     return acc;
@@ -41,7 +41,7 @@ const data = Object.values(groupedByCategory);
     index="name"
     :rounded-corners="4"
     :y-formatter="
-      (tick, i) => {
+      (tick, _i) => {
         return typeof tick === 'number'
           ? `€ ${new Intl.NumberFormat('it').format(tick).toString()}`
           : '';

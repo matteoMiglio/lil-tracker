@@ -28,7 +28,7 @@ function groupByMonth(transactions: Transaction[]) {
   const monthlyTotals = Array(12).fill(0);
 
   transactions.forEach((transaction) => {
-    const date = new Date(transaction.date);
+    const date = new Date(transaction.date ?? "");
     if (!isNaN(date.getTime())) {
       const monthIndex = date.getMonth();
       monthlyTotals[monthIndex] += Number(transaction.amount);
@@ -62,7 +62,7 @@ const data = computed(() => {
     index="name"
     :rounded-corners="4"
     :y-formatter="
-      (tick, i) => {
+      (tick, _i) => {
         return typeof tick === 'number'
           ? `€ ${new Intl.NumberFormat('it').format(tick).toString()}`
           : '';

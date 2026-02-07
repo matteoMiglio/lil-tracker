@@ -1,6 +1,6 @@
 import { h } from "vue";
 import { ArrowUpDown } from "lucide-vue-next";
-import type { ColumnDef, Row } from "@tanstack/vue-table";
+import type { ColumnDef } from "@tanstack/vue-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { currencyFormatter, formatDateString } from "@/lib/formatters";
@@ -91,7 +91,7 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "category",
-    filterFn: (row, id, value) => {
+    filterFn: (row, _id, value) => {
       return value.includes(row.original.category?.id);
     },
     header: ({ column }) => {
@@ -127,7 +127,7 @@ export const columns: ColumnDef<Transaction>[] = [
       );
     },
     cell: ({ row }) => {
-      return h("div", currencyFormatter.format(row.original.amount));
+      return h("div", currencyFormatter.format(row.original.amount ?? 0));
     },
   },
 ];

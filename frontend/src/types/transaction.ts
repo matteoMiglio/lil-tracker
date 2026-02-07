@@ -8,7 +8,7 @@ interface Transaction {
   time: string | null;
   description: string | null;
   kind: TransactionKind;
-  categoryId?: string;
+  categoryId?: string | null;
   category?: Category;
 }
 

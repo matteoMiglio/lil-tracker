@@ -84,8 +84,8 @@ const selectedValues = computed(
     <PopoverContent class="w-[200px] p-0" align="start">
       <Command
         :filter-function="
-          (list, term) =>
-            (list as DataTableFacetedFilter['options']).filter((i) =>
+          (list: DataTableFacetedFilter['options'], term: string) =>
+            list.filter((i) =>
               i.label.toLowerCase().includes(term)
             )
         "
@@ -99,7 +99,7 @@ const selectedValues = computed(
               :key="option.value"
               :value="option"
               @select="
-                (e) => {
+                () => {
                   const isSelected = selectedValues.has(option.value);
                   if (isSelected) {
                     selectedValues.delete(option.value);

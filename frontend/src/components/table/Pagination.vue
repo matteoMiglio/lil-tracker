@@ -14,15 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2 } from "lucide-vue-next";
-
 import type { Transaction } from "@/types/transaction";
 
 interface DataTablePaginationProps {
   table: Table<Transaction>;
 }
 
-const props = defineProps<DataTablePaginationProps>();
+defineProps<DataTablePaginationProps>();
 </script>
 
 <template>

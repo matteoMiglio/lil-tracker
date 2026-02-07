@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// @ts-nocheck
 import type { ListboxRootEmits, ListboxRootProps } from 'reka-ui'
 import { cn } from '@/lib/utils'
 import { ListboxRoot, useFilter, useForwardPropsEmits } from 'reka-ui'

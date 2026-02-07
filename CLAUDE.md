@@ -58,7 +58,9 @@ All models use soft deletes (`deletedAt` field).
 
 ## API Endpoints
 
-- `POST /login` — authenticate
+All endpoints except `/login` require a JWT token in the `Authorization: Bearer <token>` header.
+
+- `POST /login` — authenticate, returns `{ token }` (7-day expiry)
 - `GET|POST /transactions` — list / create
 - `GET|PUT|DELETE /transactions/:id` — read / update / soft-delete
 - `GET|POST /categories` — list / create
@@ -101,6 +103,7 @@ Run lint and typecheck; verify with `git status` and `git diff`.
 |---|---|
 | `DATABASE_URL` | SQLite connection string (e.g. `file:/app/prisma/dev.db`) |
 | `DEFAULT_ADMIN_PASSWORD` | Password for seeded admin user |
+| `JWT_SECRET` | Secret key for signing JWT tokens (required) |
 | `VITE_API_URL` | Backend URL for frontend dev (e.g. `http://localhost:31000`) |
 
 ## Code Style Guidelines

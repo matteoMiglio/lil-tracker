@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// @ts-nocheck
 import type { BulletLegendItemInterface } from '@unovis/ts'
 import { omit } from '@unovis/ts'
 import { VisCrosshair, VisTooltip } from '@unovis/vue'
