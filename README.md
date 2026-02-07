@@ -1,37 +1,59 @@
-# 💸 Lil Tracker
+# Lil Tracker
 
 **Lil Tracker** is a lightweight, self-hosted web application that helps you effortlessly track your incomes and expenses. Simple, clean, and made to get out of your way while giving you full control over your personal finances.
 
-## ✨ Features
+## Features
 
-- 📊 Track **incomes** and **expenses** in a clean, intuitive UI
-- 🏷️ Organize transactions with **custom categories**
-- ⚡ Fast, lightweight, and Dockerized
-- 🗃️ **SQLite** for easy data persistence with zero setup
-- 🔐 Backend is only accessible internally through the frontend
+- Track **incomes** and **expenses** in a clean, intuitive UI
+- Organize transactions with **custom categories**
+- Fast, lightweight, and Dockerized
+- **SQLite** for easy data persistence with zero setup
+- **JWT authentication** — backend routes are protected
+- Backend is only accessible internally through the Nginx proxy
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 lil-tracker/
-├── backend/        ← Bun + Prisma + SQLite API
-├── frontend/       ← Vue.js + Tailwind UI served via Nginx
+├── backend/        ← Bun + Fastify + Prisma + SQLite API
+├── frontend/       ← Vue 3 + Tailwind CSS served via Nginx
+├── utils/          ← Backup/restore scripts
 ├── docker-compose.yml
-└── README.md
+└── .env.example
 ```
 
-## 🚀 Getting Started
+## Getting Started
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/lil-tracker.git
+git clone https://github.com/matteoMiglio/lil-tracker.git
 cd lil-tracker
 ```
 
-### 2. Start the application
+### 2. Configure environment variables
 
-Use Docker Compose to spin up both frontend and backend:
+Copy the example env file and edit the values:
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and set your values:
+
+```env
+DATABASE_URL=file:/app/prisma/dev.db
+DEFAULT_ADMIN_PASSWORD=your-secure-password
+JWT_SECRET=your-random-secret-string
+```
+
+> **Important:** Change `JWT_SECRET` to a long random string and `DEFAULT_ADMIN_PASSWORD` to a secure password.
+
+### 3. Start the application
 
 ```bash
 docker compose up -d --build
@@ -39,51 +61,65 @@ docker compose up -d --build
 
 This will:
 
-- Build and run the Bun-powered backend
-- Build the Vue + Nginx frontend
-- Automatically create the SQLite database with the latest schema
+- Build and run the Bun-powered backend (internal port 31000, not exposed)
+- Build the Vue 3 + Nginx frontend
+- Automatically run database migrations, seed the admin user, and start the server
 
-### 3. Access the app
+### 4. Access the app
 
-Once everything is up, open your browser at:
+Open your browser at:
 
-```text
-http://localhost:8080
+```
+http://localhost:3000
 ```
 
-## 🛠️ Development
+Log in with username `admin` and the password you set in `DEFAULT_ADMIN_PASSWORD`.
 
-### Prerequisites
+## Development
 
-- `Docker`
-- `Docker Compose`
+### Local development (without Docker)
 
-### Local development
-
-If you want to develop locally without Docker:
-
-1. Backend
+#### Backend
 
 ```bash
 cd backend
 bun install
+bunx prisma migrate deploy
+bunx prisma generate
 bun run dev
 ```
 
-2. Frontend
+The backend runs on `http://localhost:31000`.
+
+#### Frontend
 
 ```bash
 cd frontend
-bun install
-bun run dev
+npm install
+npm run dev
 ```
 
-You may need to update the API URL in the frontend to point to your local backend server.
+The frontend dev server runs on `http://localhost:5173` and proxies API requests to the backend.
 
-## ⚙️ Environment Variables
+> Set `VITE_API_URL=http://localhost:31000` in your frontend environment if the default proxy doesn't work.
 
-The backend uses a `.env` file to configure the database:
+## Environment Variables
 
-`DATABASE_URL="file:./prisma/database/dev.db"`
+| Variable | Description | Example |
+|---|---|---|
+| `DATABASE_URL` | SQLite connection string | `file:/app/prisma/dev.db` |
+| `DEFAULT_ADMIN_PASSWORD` | Password for the seeded admin user | `your-secure-password` |
+| `JWT_SECRET` | Secret key for signing JWT tokens | `your-random-secret-string` |
+| `VITE_API_URL` | Backend URL for frontend dev server | `http://localhost:31000` |
 
-This is handled automatically by Docker Compose. For custom setups, ensure this path points to your SQLite file.
+## Backup & Restore
+
+Utility scripts are available in the `utils/` directory:
+
+```bash
+# Backup the database
+./utils/backup.sh
+
+# Restore from a backup
+./utils/restore.sh <backup-file>
+```
