@@ -1,12 +1,9 @@
 import { defineStore } from "pinia";
-import type { Transaction } from "@/types/transaction";
-import { generateFakeTransactions } from "@/lib/fakeData";
-
-const API_BASE_URL = "/api";
+import { apiFetch } from "@/lib/api";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    isLoggedIn: false,
+    isLoggedIn: !!localStorage.getItem("auth_token"),
   }),
   actions: {
     async login(username: string, password: string): Promise<void> {
@@ -16,11 +13,8 @@ export const useAuthStore = defineStore("auth", {
         throw new Error("Username and password are required");
       }
 
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      const response = await apiFetch("/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ username, password }),
       });
 
@@ -30,7 +24,13 @@ export const useAuthStore = defineStore("auth", {
         throw new Error("Si è verificato un errore durante il login");
       }
 
+      const data = (await response.json()) as { token: string };
+      localStorage.setItem("auth_token", data.token);
       this.isLoggedIn = true;
+    },
+    logout() {
+      localStorage.removeItem("auth_token");
+      this.isLoggedIn = false;
     },
   },
 });
