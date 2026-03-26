@@ -135,3 +135,52 @@ Utility scripts are available in the `utils/` directory:
 # Restore from a backup
 ./utils/restore.sh <backup-file>
 ```
+
+## Raspberry Pi Reverse Proxy
+
+If you want to expose the app on your local network from a Raspberry Pi without a real domain, you can place Nginx in front of Docker and use a self-signed certificate.
+
+Start the app normally:
+
+```bash
+docker compose up -d --build
+```
+
+This project includes a ready-to-use Nginx config at `deploy/nginx/lil-tracker-self-signed.conf`. It:
+
+- Redirects HTTP to HTTPS
+- Terminates TLS on the Raspberry Pi
+- Proxies requests to the frontend container on `127.0.0.1:3000`
+
+Generate a self-signed certificate on the Raspberry Pi:
+
+```bash
+sudo mkdir -p /etc/nginx/ssl
+sudo openssl req -x509 -nodes -days 825 -newkey rsa:2048 \
+  -keyout /etc/nginx/ssl/lil-tracker.key \
+  -out /etc/nginx/ssl/lil-tracker.crt \
+  -subj "/CN=raspberrypi.local"
+```
+
+Install the Nginx site:
+
+```bash
+sudo cp deploy/nginx/lil-tracker-self-signed.conf /etc/nginx/sites-available/lil-tracker
+sudo ln -s /etc/nginx/sites-available/lil-tracker /etc/nginx/sites-enabled/lil-tracker
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+You can then access the app with:
+
+```text
+https://<raspberry-pi-ip>
+```
+
+or, if mDNS is working on your network:
+
+```text
+https://raspberrypi.local
+```
+
+Browsers will show a certificate warning until you manually trust the self-signed certificate.
